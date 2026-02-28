@@ -1,0 +1,43 @@
+services:
+
+  db:
+    image: mysql:9.6.0
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - ${MYSQL_PORT_EXPOSE}:${MYSQL_PORT}
+    volumes:
+      - ${VOLUMES_DB_SAVE}
+      - ${VOLUME_CREATE_DATABASES} 
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  service-departments:
+    depends_on:
+      db: 
+        condition: service_healthy
+    build: ./department_backend/
+    env_file:
+    - .env
+    restart: on-failure
+    ports:
+      - ${PORT_EXPOSE_SERVICE_DEPARTMENTS}:${PORT_DOCKER}
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DBNET: tcp
+      MYSQL_DBADDR: db:${MYSQL_PORT}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+
+
+volumes:
+  mysql-data:
