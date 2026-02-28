@@ -34,7 +34,8 @@ services:
     environment:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DBNET: tcp
+      MYSQL_DBNET: ${MYSQL_DBNET}
+      PORT_LISTEN: ${PORT_DOCKER}
       MYSQL_DBADDR: db:${MYSQL_PORT}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
 
