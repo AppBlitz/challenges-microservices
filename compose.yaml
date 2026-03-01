@@ -1,6 +1,6 @@
 services:
 
-  db-employee:
+  db-e:
     image: postgres:18
     restart: unless-stopped
     env_file:
@@ -14,7 +14,7 @@ services:
     volumes:
       - ${POSTGRES_VOLUMEN_DATA_SAVE}
 
-  db-department:
+  db-d:
     image: mysql:9.6.0
     restart: unless-stopped
     env_file:
@@ -50,13 +50,13 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DBNET: ${MYSQL_DBNET}
       PORT_LISTEN: ${PORT_DOCKER}
-      MYSQL_DBADDR: db-department:${MYSQL_PORT}
+      MYSQL_DBADDR: db-d:${MYSQL_PORT}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
 
 
   service-employees:
     env_file:
-      - employee.env
+      - dataE.env
 
 
 volumes:
