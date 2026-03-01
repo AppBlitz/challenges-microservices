@@ -1,10 +1,24 @@
 services:
 
-  db:
+  db-employee:
+    image: postgres:18
+    restart: unless-stopped
+    env_file:
+      - dataE.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - ${POSTGRES_PORT_EXPOSE}:${POSTGRES_PORT_DOCKER}
+    volumes:
+      - ${POSTGRES_VOLUMEN_DATA_SAVE}
+
+  db-department:
     image: mysql:9.6.0
     restart: unless-stopped
     env_file:
-      - department.env
+      - dataD.env
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -27,7 +41,7 @@ services:
         condition: service_healthy
     build: ./department_backend/
     env_file:
-    - .env
+    - dataD.env
     restart: on-failure
     ports:
       - ${PORT_EXPOSE_SERVICE_DEPARTMENTS}:${PORT_DOCKER}
@@ -36,9 +50,16 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DBNET: ${MYSQL_DBNET}
       PORT_LISTEN: ${PORT_DOCKER}
-      MYSQL_DBADDR: db:${MYSQL_PORT}
+      MYSQL_DBADDR: db-department:${MYSQL_PORT}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
 
 
+  service-employees:
+    env_file:
+      - employee.env
+
+
 volumes:
+  postgres-data:
   mysql-data:
+  
