@@ -4,7 +4,7 @@ services:
     image: postgres:18
     restart: unless-stopped
     env_file:
-      - dataE.env
+      - .env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -13,12 +13,18 @@ services:
       - ${POSTGRES_PORT_EXPOSE}:${POSTGRES_PORT_DOCKER}
     volumes:
       - ${POSTGRES_VOLUMEN_DATA_SAVE}
+      - ${POSTGRES_VOLUMEN_DATABASE}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   db-d:
     image: mysql:9.6.0
     restart: unless-stopped
     env_file:
-      - dataD.env
+      - .env
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -37,11 +43,11 @@ services:
 
   service-departments:
     depends_on:
-      db: 
+      db-d: 
         condition: service_healthy
     build: ./department_backend/
     env_file:
-    - dataD.env
+    - .env
     restart: on-failure
     ports:
       - ${PORT_EXPOSE_SERVICE_DEPARTMENTS}:${PORT_DOCKER}
@@ -53,10 +59,26 @@ services:
       MYSQL_DBADDR: db-d:${MYSQL_PORT}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
 
-
   service-employees:
+    depends_on:
+      db-e: 
+        condition: service_healthy
+    build: ./employee-backend/
     env_file:
-      - dataE.env
+      - .env
+    restart: on-failure
+    ports:
+      - ${PORT_SE_EXPOSE}:${PORT_SE_DOCKER}
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SERVER_DRIVE: ${SERVER_DRIVE}
+      DDL_AUTO: ${DDL_AUTO}
+      HIBERNATE_DIALECT: ${HIBERNATE_DIALECT}
+      DB_URI: db-e
+      PORT: ${POSTGRES_PORT_DOCKER}
+      NAME_DATABASE: ${POSTGRES_DB}
+      URI_SERVICE_D: http://service-departments:${PORT_DOCKER}
 
 
 volumes:

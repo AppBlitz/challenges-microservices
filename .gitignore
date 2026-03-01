@@ -1,4 +1,4 @@
-dataD.env
-dataE.env
+.env
 db-init/
 db-init-postgres/
+

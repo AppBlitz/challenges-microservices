@@ -3,7 +3,9 @@ package mysqls
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -33,11 +35,19 @@ func ConnectionDatabaseMysql() (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	pingErr := db.Ping()
-	if pingErr != nil {
-		return nil, pingErr
+
+	maxRetries := 10
+	for range maxRetries {
+		// Intentamos conectar silenciosamente
+		if err := db.Ping(); err == nil {
+			// Conexión exitosa
+			db.SetMaxOpenConns(4)
+			db.SetMaxIdleConns(2)
+			return db, nil
+		}
+
+		time.Sleep(2 * time.Second)
 	}
-	db.SetMaxOpenConns(4)
-	db.SetMaxIdleConns(2)
-	return db, nil
+
+	return nil, fmt.Errorf("no se pudo conectar a MySQL tras %d intentos", maxRetries)
 }
