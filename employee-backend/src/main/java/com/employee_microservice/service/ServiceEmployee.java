@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.employee_microservice.api.MicroserviceDepartment;
@@ -16,6 +17,9 @@ import com.employee_microservice.util.MapperEmployee;
 
 @Service
 public class ServiceEmployee implements interfaceEmployee {
+
+  @Value("${URI_SERVICE_D}")
+  private String uri;
 
   @Autowired
   private EmployeeRepository Employeerepository;
@@ -34,7 +38,7 @@ public class ServiceEmployee implements interfaceEmployee {
 
   @Override
   public EmployeeDtoResponse saveEmployee(EmployeeDtoRequest employeeDto) throws IOException, InterruptedException {
-    String url = "";
+    String url = uri + "/department/search/" + employeeDto.department_id() + "/";
     boolean response = apiMicroservice.dataMicroserviceDepartment(url);
     if (!response) {
       return null;
