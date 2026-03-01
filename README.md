@@ -1,5 +1,5 @@
-[English](#English Version)
-[Español](#Versión en Español)
+[English](#English)
+[Español](#Spanish)
 
 # Compresión - Sistema de Microservicios
 
@@ -7,7 +7,7 @@ Este proyecto implementa una arquitectura de microservicios para la gestión emp
 
 ---
 
-## Versión en Español
+## Spanish
 
 ### Microservicio 1: Gestión de Empleados
 Este servicio administra el ciclo de vida de los registros de empleados:
@@ -31,7 +31,7 @@ El despliegue se realiza mediante Docker Compose, permitiendo la orquestación s
 
 ---
 
-## English Version
+## English
 
 ### Microservice 1: Employee Management
 This service handles the administration of employee records:
