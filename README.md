@@ -1,29 +1,54 @@
+(English)[English Version]
 
 
-# Compresiòn
+# Compresión - Sistema de Microservicios
 
-Es un proyecto que utiliza la arquitectura orientada a microservicios:
+Este proyecto implementa una arquitectura de microservicios para la gestión empresarial, enfocada en la interacción entre empleados y unidades organizacionales.
 
-## Microservicio 1: gestiòn de empleados
- 
-Para este microservico lo que se hace es crear al empleado, tiene una base de datos SQL(relacional), que es mysql,cuando el microservicio se utiliza para crear a un nuevo empleado es necesario que se le asigne un  departamento, este departamento esta gestionado por otro mciroservico(màs adelante se daran màs detalles), lo que hace es que cuando se crea un nuevo empleado se debe de enviar una solcitud http al mucroservicio de departamnetos y verificar si existe, en caso de que no exista no se puede agregar lo que es el empleado y se envia un null al cliente, si todo sigue su flujo como deberia de ser, se crea el empelado correctamente. 
+---
 
-### Requisitos
-- MYSQL
- 
+## Versión en Español
 
-## Microservicio 2: Gestion de departamento
+### Microservicio 1: Gestión de Empleados
+Este servicio administra el ciclo de vida de los registros de empleados:
+* **Persistencia:** Utiliza una base de datos relacional MySQL.
+* **Lógica de Negocio:** Al registrar un nuevo empleado, es obligatorio asignarle un departamento existente.
+* **Interacción:** El sistema realiza una solicitud HTTP sincrónica al Microservicio de Departamentos para validar su existencia.
+* **Validación:** Si el departamento no se encuentra, la operación se cancela y se retorna un valor nulo al cliente para garantizar la integridad referencial.
 
-Para este microservicio se escogio la base de datos relacioal postgresql debido a su simplicidad, tambièn se busca debido a que las entidias pueden crecer y nos ayudan mucho al manejo de la base de datos, lo que se busca es poder agregar departamnetos, buscarlos. 
+**Requisitos:** MySQL.
 
-### Requisitos
-- postgresql
+### Microservicio 2: Gestión de Departamentos
+Este servicio gestiona las entidades de departamentos, permitiendo su creación y consulta:
+* **Persistencia:** Se seleccionó PostgreSQL por su robustez, escalabilidad y eficiencia en el manejo de datos relacionales.
 
-# Configuraciòn
+**Requisitos:** PostgreSQL.
 
-Se debe de tener conocimiento de las variables de entorno que se debe utilizar  en el docker compose, debido a que se utiliza para poder hacer que todos los servicios de desplegaran al mismo tiempo y sea mucho màs fàcil el poder gestionaralo, tambièn hay que tener en cuenta que la conexiòn entre empleados y departamentos funciona de forma sincronica, esto es debido  a que necesitamos bloquear un servicio para esperar la respuesta del otro y ahì si poder devolver una respuesta al cliente
+### Configuración y Despliegue
+El despliegue se realiza mediante Docker Compose, permitiendo la orquestación simultánea de todos los servicios:
+* **Variables de Entorno:** Es fundamental configurar correctamente las variables en el archivo docker-compose.yml.
+* **Comunicación Sincrónica:** La conexión entre Empleados y Departamentos es de tipo bloqueante; el primer servicio espera la validación del segundo antes de confirmar la respuesta al usuario final.
 
+---
 
+## English Version
 
+### Microservice 1: Employee Management
+This service handles the administration of employee records:
+* **Persistence:** Uses a MySQL relational database.
+* **Business Logic:** When creating a new employee, it is mandatory to assign them to an existing department.
+* **Interaction:** The system performs a synchronous HTTP request to the Department Microservice to validate its existence.
+* **Validation:** If the department does not exist, the operation is canceled, returning a null value to the client to ensure referential integrity.
 
+**Requirements:** MySQL.
 
+### Microservice 2: Department Management
+This service manages department entities, allowing for their creation and retrieval:
+* **Persistence:** PostgreSQL was selected due to its robustness, reliability, and ability to scale as entities grow.
+
+**Requirements:** PostgreSQL.
+
+### Configuration and Deployment
+Deployment is managed through Docker Compose, allowing for the simultaneous orchestration of all services:
+* **Environment Variables:** It is essential to correctly configure the environment variables within the docker-compose.yml file.
+* **Synchronous Communication:** The connection between Employees and Departments is blocking (synchronous), as the first service must wait for validation from the second before confirming the final response.
