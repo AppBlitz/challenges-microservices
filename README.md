@@ -1,5 +1,5 @@
-(English)[#English Version]
-
+[English](#English Version)
+[Español](#Versión en Español)
 
 # Compresión - Sistema de Microservicios
 
