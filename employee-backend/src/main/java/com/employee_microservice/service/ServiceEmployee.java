@@ -37,14 +37,18 @@ public class ServiceEmployee implements interfaceEmployee {
   }
 
   @Override
-  public EmployeeDtoResponse saveEmployee(EmployeeDtoRequest employeeDto) throws IOException, InterruptedException {
+  public Optional<EmployeeDtoResponse> saveEmployee(EmployeeDtoRequest employeeDto)
+      throws IOException, InterruptedException {
     String url = uri + "/department/search/" + employeeDto.department_id() + "/";
     boolean response = apiMicroservice.dataMicroserviceDepartment(url);
-    if (!response) {
-      return null;
+    Optional<EmployeeDtoResponse> optional;
+    if (response) {
+      Employee employee = mapperEmployee.getDtoToEmployee(employeeDto);
+      optional = Optional.ofNullable(mapperEmployee.getEmployee(employee));
+    } else {
+      optional = Optional.empty();
     }
-    Employee employee = mapperEmployee.getDtoToEmployee(employeeDto);
-    return mapperEmployee.getEmployee(Employeerepository.save(employee));
+    return optional;
   }
 
 }

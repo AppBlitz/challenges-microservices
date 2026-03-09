@@ -1,6 +1,7 @@
 package com.employee_microservice.controller;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,13 +30,18 @@ public class ControllerEmployee {
 
   @GetMapping(path = "/retrieve/{idEmployee}", produces = "application/json")
   public ResponseEntity<EmployeeDtoResponse> retrieveEmployee(@PathVariable("idEmployee") Long idEmployee) {
+
     return ResponseEntity.ok((serviceEmployee.getEmployeeForID(idEmployee)));
   }
 
   @PostMapping(path = "/save/", produces = "application/json")
   public ResponseEntity<EmployeeDtoResponse> updateEmployee(@Valid @RequestBody EmployeeDtoRequest employeeDto)
       throws IOException, InterruptedException {
-    return ResponseEntity.ok((serviceEmployee.saveEmployee(employeeDto)));
+    Optional<EmployeeDtoResponse> response = serviceEmployee.saveEmployee(employeeDto);
+    if (response.isEmpty()) {
+      return ResponseEntity.status(404).body(null);
+    }
+    return ResponseEntity.ok(response.get());
   }
 
 }

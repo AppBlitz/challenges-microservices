@@ -1,6 +1,7 @@
 package com.employee_microservice.service.intefacesService;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import com.employee_microservice.model.dto.EmployeeDtoRequest;
 import com.employee_microservice.model.dto.EmployeeDtoResponse;
@@ -21,5 +22,6 @@ public interface interfaceEmployee {
    *         database
    */
 
-  public EmployeeDtoResponse saveEmployee(EmployeeDtoRequest employeeDto) throws IOException, InterruptedException;
+  public Optional<EmployeeDtoResponse> saveEmployee(EmployeeDtoRequest employeeDto)
+      throws IOException, InterruptedException;
 }

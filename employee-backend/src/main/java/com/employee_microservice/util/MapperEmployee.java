@@ -10,7 +10,6 @@ import com.employee_microservice.model.entitys.Employee;
 public class MapperEmployee {
 
         public Employee getDtoToEmployee(EmployeeDtoRequest employeeDto) {
-                System.out.println(employeeDto);
                 return new Employee(employeeDto.id_employee(), employeeDto.email(), employeeDto.name_one(),
                                 employeeDto.other_name(), employeeDto.first_surname(), employeeDto.second_surname(),
                                 employeeDto.telephone(), employeeDto.address(), employeeDto.postcode(),

@@ -28,7 +28,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
   implementation("org.springframework.cloud:spring-cloud-starter-openfeign:5.0.1")
+  implementation ("org.springframework.boot:spring-boot-starter-amqp")
 	implementation("org.modelmapper:modelmapper:3.2.6")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("org.postgresql:postgresql")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -38,6 +40,8 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+  testImplementation ("org.springframework.boot:spring-boot-starter-amqp-test")
+  developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 }
 
 tasks.withType<Test> {
