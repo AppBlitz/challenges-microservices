@@ -27,11 +27,10 @@ RUN go build -o /app/myapp ./cmd/app/main.go
 # Etapa final (ligera)
 FROM alpine:3.21 AS final
 
+RUN apk add --no-cache curl
 # Copia el binario compilado
 COPY --from=builder /app/myapp /bin/app
 
-# Expone el puerto
-EXPOSE 8080
 
 # Ejecuta la aplicación
 CMD ["/bin/app"]

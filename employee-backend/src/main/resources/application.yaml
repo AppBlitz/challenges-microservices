@@ -18,8 +18,8 @@ spring:
   rabbitmq:
     username: ${RABBIT_USERNAME}
     password: ${RABBIT_PASSWORD}
-    port: ${RABBIT_PORT}
     host: ${RABBIT_HOST}
+    port: ${RABBIT_PORT}
 
 cors:
   hostOne: ${ORIGINONE}

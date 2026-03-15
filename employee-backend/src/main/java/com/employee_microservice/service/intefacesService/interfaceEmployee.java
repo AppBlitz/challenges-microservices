@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.employee_microservice.model.dto.EmployeeDtoRequest;
 import com.employee_microservice.model.dto.EmployeeDtoResponse;
+import com.employee_microservice.model.entitys.Employee;
 
 public interface interfaceEmployee {
   /**
@@ -24,4 +25,6 @@ public interface interfaceEmployee {
 
   public Optional<EmployeeDtoResponse> saveEmployee(EmployeeDtoRequest employeeDto)
       throws IOException, InterruptedException;
+
+  public void sendMessageToBroker(Employee employee);
 }

@@ -36,9 +36,9 @@ services:
       - ${VOLUME_CREATE_DATABASES} 
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      interval: 4s
+      timeout: 9s
+      retries: 10
 
   service-departments:
     depends_on:

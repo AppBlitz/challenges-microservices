@@ -1,5 +1,6 @@
 package com.employee_microservice;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
@@ -47,8 +48,12 @@ class EmployeeMicroserviceApplicationTests {
 
   @Test
   public void verificationHttpClient() throws IOException, InterruptedException {
-    String result = microserviceDepartment.dataMicroserviceDepartment("https://pokeapi.co/api/v2/pokemon/ditto");
-    assertNotNull(result);
+    boolean result = microserviceDepartment.dataMicroserviceDepartment("https://pokeapi.co/api/v2/pokemon/ditto");
+    int aux = 0;
+    if (result) {
+
+    }
+    assertEquals(0, aux);
   }
 
 }

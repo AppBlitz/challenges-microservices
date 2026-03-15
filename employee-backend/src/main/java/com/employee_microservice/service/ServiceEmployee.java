@@ -1,6 +1,7 @@
 package com.employee_microservice.service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.employee_microservice.api.MicroserviceDepartment;
 import com.employee_microservice.model.dto.EmployeeDtoRequest;
 import com.employee_microservice.model.dto.EmployeeDtoResponse;
+import com.employee_microservice.model.dto.MessageRabbitMq;
 import com.employee_microservice.model.entitys.Employee;
 import com.employee_microservice.repository.EmployeeRepository;
 import com.employee_microservice.service.intefacesService.interfaceEmployee;
@@ -30,6 +32,9 @@ public class ServiceEmployee implements interfaceEmployee {
   @Autowired
   private MapperEmployee mapperEmployee;
 
+  @Autowired
+  private ServiceRabbitMq serviceRabbitMq;
+
   @Override
   public EmployeeDtoResponse getEmployeeForID(Long id) {
     Optional<Employee> employee = Employeerepository.findById(id);
@@ -44,11 +49,20 @@ public class ServiceEmployee implements interfaceEmployee {
     Optional<EmployeeDtoResponse> optional;
     if (response) {
       Employee employee = mapperEmployee.getDtoToEmployee(employeeDto);
-      optional = Optional.ofNullable(mapperEmployee.getEmployee(employee));
+      optional = Optional.ofNullable(mapperEmployee.getEmployee(Employeerepository.save(employee)));
+      sendMessageToBroker(employee);
     } else {
       optional = Optional.empty();
     }
     return optional;
+  }
+
+  @Override
+  public void sendMessageToBroker(Employee employee) {
+    MessageRabbitMq messageRabbitMq = new MessageRabbitMq(employee.getIdEmployee(),
+        employee.getNameOne() + employee.getOtherName() + employee.getFirstSurname() + employee.getSecondSurname(),
+        employee.getEmail(), employee.getIdDepartment(), LocalDateTime.now());
+    serviceRabbitMq.senMessageAndBrokerRabbitMq(messageRabbitMq);
   }
 
 }
