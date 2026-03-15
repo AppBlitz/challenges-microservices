@@ -1,4 +1,18 @@
 services:
+  db-logs:
+    image: cassandra:5
+    restart: unless-stopped
+    env_file:
+     - .env
+    environment:
+      CASSANDRA_CLUSTER_NAME: ${NAME_CASSANDRA}
+      JVM_OPTS: "-Xms512M -Xmx512M"
+      MAX_HEAP_SIZE: 512M
+      HEAP_NEWSIZE: 100M
+    ports:
+      - ${PORT_EXPOSE_CASSANDRA}:${PORT_DOCKER_CASSANDRA}
+    volumes:
+      - ${VOLUME_CASSANDRA}
   db-e:
     image: postgres:18
     restart: unless-stopped
@@ -83,6 +97,10 @@ services:
       RABBIT_PASSWORD: ${RABBITMQ_DEFAULT_PASS}
       RABBIT_PORT: ${PORTS_CLIENT_RABBIT_DOCKER}
       RABBIT_HOST: service-rabbitmq
+      NAME_QUEUE: ${NAME_QUEUE}
+      EVENT_ONE: ${EVENT_ONE}
+      EVENT_TWO: ${EVENT_TWO}
+      DIRECT_EXCHANGE: ${EXCHANGE_RABBIT}
       URI_SERVICE_D: http://service-departments:${PORT_DOCKER}
  
   service-rabbitmq:
@@ -112,12 +130,19 @@ services:
      RABBITMQ_PASSWORD: ${RABBITMQ_DEFAULT_PASS}
      RABBITMQ_ADDRESS: service-rabbitmq
      RABBITMQ_PORT: ${PORTS_CLIENT_RABBIT_DOCKER}
+     EXCHANGE_RABBIT: ${EXCHANGE_RABBIT}
+     EVENT_ONE: ${EVENT_ONE}
+     EVENT_TWO: ${EVENT_TWO}
     depends_on:
       service-rabbitmq:
         condition: service_healthy
+
+
+
      
 
 volumes:
   postgres-data:
   mysql-data:
+  db-logs:
   

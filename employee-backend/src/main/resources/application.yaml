@@ -20,6 +20,10 @@ spring:
     password: ${RABBIT_PASSWORD}
     host: ${RABBIT_HOST}
     port: ${RABBIT_PORT}
+    name_queue: ${NAME_QUEUE}
+    event_one : ${EVENT_ONE}
+    event_two: ${EVENT_TWO}
+    direct_exchange: ${DIRECT_EXCHANGE}
 
 cors:
   hostOne: ${ORIGINONE}
