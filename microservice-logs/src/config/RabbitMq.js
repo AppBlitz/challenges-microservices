@@ -7,33 +7,65 @@ const port_rabbit = process.env.RABBITMQ_PORT
 const exchange_rabbit = process.env.EXCHANGE_RABBIT
 const event_one = process.env.EVENT_ONE
 const event_two = process.env.EVENT_TWO
+const rabbitmq_name = process.env.RABBITMQ_NAME
 
 const options = { credentials: credentials.plain(user_rabbit, password_rabbit) }
 const url = `amqp://${rabbit_host}:${port_rabbit}`
 
 async function connectionRabbitMq() {
-  try {
-    const connection = await connect(url, options);
-    const channel = await connection.createChannel();
-    await channel.assertExchange(exchange_rabbit, "direct", {
-      durable: false
-    });
-    const auxiliary_queue = await channel.assertQueue('', {
-      exclusive: true
-    })
-    channel.bindQueue("employee", exchange_rabbit, event_one)
-    channel.bindQueue("employee", exchange_rabbit, event_two)
-    channel.consume(auxiliary_queue.queue, function (message) {
-      if (message !== "null") {
-        const routikey = message.fields.routingKey;
+  let attempts = 10;
+
+  while (attempts > 0) {
+    try {
+      const connection = await connect(url, options);
+      const channel = await connection.createChannel();
+
+      await channel.assertExchange(exchange_rabbit, "direct", {
+        durable: false
+      });
+
+      const queue = await channel.assertQueue(rabbitmq_name, {
+        durable: false
+      });
+
+      await channel.bindQueue(queue.queue, exchange_rabbit, event_one);
+      await channel.bindQueue(queue.queue, exchange_rabbit, event_two);
+
+      channel.consume(queue.queue, (message) => {
+        if (message !== null) {
+          const routingKey = message.fields.routingKey;
+
+          switch (routingKey) {
+            case event_one:
+              console.log(message.content.toString());
+              break;
+
+            case event_two:
+              console.log(message.content.toString());
+              break;
+
+            default:
+              break;
+          }
+        }
+      }, { noAck: true });
+
+      return;
+
+    } catch (error) {
+      attempts--;
+
+      if (attempts === 0) {
+        return;
       }
-    }, {
-      noAck: true
+
+      await sleep(5000);
     }
-    )
-  } catch (error) {
-    console.error(error)
   }
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 export { connectionRabbitMq }
+

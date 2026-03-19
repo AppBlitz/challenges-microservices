@@ -133,6 +133,7 @@ services:
      EXCHANGE_RABBIT: ${EXCHANGE_RABBIT}
      EVENT_ONE: ${EVENT_ONE}
      EVENT_TWO: ${EVENT_TWO}
+     RABBITMQ_NAME: ${NAME_QUEUE}
     depends_on:
       service-rabbitmq:
         condition: service_healthy
