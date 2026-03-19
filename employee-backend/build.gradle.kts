@@ -31,6 +31,7 @@ dependencies {
 	implementation("org.modelmapper:modelmapper:3.2.6")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
 	implementation("org.springframework.boot:spring-boot-starter-amqp")
+	implementation("org.json:json:20250517")
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("org.postgresql:postgresql")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")

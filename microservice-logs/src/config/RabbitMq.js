@@ -1,4 +1,5 @@
 import { connect, credentials } from "amqplib"
+import { insert_log_save_employee } from "../services/service_logs.js"
 
 const user_rabbit = process.env.RABBITMQ_USER
 const password_rabbit = process.env.RABBITMQ_PASSWORD
@@ -34,10 +35,19 @@ async function connectionRabbitMq() {
       channel.consume(queue.queue, (message) => {
         if (message !== null) {
           const routingKey = message.fields.routingKey;
-
+          console.log(JSON.parse(message.content.toString()));
+          const message_json = JSON.parse(message.content.toString());
           switch (routingKey) {
             case event_one:
-              console.log(message.content.toString());
+              insert_log_save_employee(JSON.stringify(
+                {
+                  ID_employee: message_json.id,
+                  name_employee: message_json.nameUser,
+                  email_employee: message_json.email,
+                  department_id: message_json.departmentID,
+                  date_enter: message_json.dateEnter
+                }
+              ));
               break;
 
             case event_two:

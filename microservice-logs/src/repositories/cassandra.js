@@ -1,5 +1,5 @@
 import { Client } from "cassandra-driver"
-const host_cassandra = process.env.host_cassandra
+const host_cassandra = process.env.RABBITMQ_HOST;
 const query_save_employee = "INSERT INTO register_logs (ID_employee,name_employee,email_employee,department_id,date_enter) VALUES(?,?,?,?,?)";
 const query_log_delete_employee = "";
 const query_search_all_notifications_ID_employee = "SELECT * FROM  register_logs WHERE ID_employee = ? ";

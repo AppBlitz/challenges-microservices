@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.amqp.core.DirectExchange;
 import com.employee_microservice.model.dto.MessageRabbitMq;
 import com.employee_microservice.service.intefacesService.InterfaceServiceRabbit;
+import org.json.JSONObject;
 
 @Service
 public class ServiceRabbitMq implements InterfaceServiceRabbit {
@@ -18,8 +19,14 @@ public class ServiceRabbitMq implements InterfaceServiceRabbit {
 
   @Override
   public void senMessageAndBrokerRabbitMq(MessageRabbitMq mRabbitMq) {
-    rabbitTemplate.convertAndSend(direct.getName(), "employee.delete", mRabbitMq.toString().getBytes());
-    rabbitTemplate.convertAndSend(direct.getName(), "employee.save", mRabbitMq.toString().getBytes());
+
+    JSONObject object = new JSONObject();
+    object.put("id", mRabbitMq.id());
+    object.put("nameUser", mRabbitMq.nameUser());
+    object.put("email", mRabbitMq.email());
+    object.put("departmentID", mRabbitMq.departmentID());
+    object.put("dateEnter", mRabbitMq.dateEnter());
+    rabbitTemplate.convertAndSend(direct.getName(), "employee.delete", object.toString().getBytes());
   }
 
 }
