@@ -36,6 +36,7 @@ async function connectionRabbitMq() {
         if (message !== null) {
           const routingKey = message.fields.routingKey;
           const message_json = JSON.parse(message.content.toString());
+          console.log(routingKey)
           switch (routingKey) {
             case event_one:
               insert_log_save_employee(JSON.stringify(

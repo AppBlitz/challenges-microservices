@@ -26,7 +26,7 @@ public class ServiceRabbitMq implements InterfaceServiceRabbit {
     object.put("email", mRabbitMq.email());
     object.put("departmentID", mRabbitMq.departmentID());
     object.put("dateEnter", mRabbitMq.dateEnter());
-    rabbitTemplate.convertAndSend(direct.getName(), "employee.delete", object.toString().getBytes());
+    rabbitTemplate.convertAndSend(direct.getName(), "employee.save", object.toString().getBytes());
   }
 
 }
