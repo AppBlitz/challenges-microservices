@@ -7,6 +7,7 @@ try {
 }
 const server = http.createServer({ keepAliveTimeout: 600000 }, (req, res) => {
   const { method, url } = req;
+  console.log("this url", url.split("/")[1] == "notifications")
   if (method === "GET") {
     controller_notifications.get_notification_id_employee(req, res);
   } else {

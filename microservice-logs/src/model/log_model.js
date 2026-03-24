@@ -1,4 +1,4 @@
-class Log {
+export default class Log {
   constructor(id_employee, name_employee, email_employee, department_id, date_enter) {
     this._id_employee = id_employee;
     this._name_employee = name_employee;
@@ -51,4 +51,3 @@ class Log {
 }
 
 
-export { Log }

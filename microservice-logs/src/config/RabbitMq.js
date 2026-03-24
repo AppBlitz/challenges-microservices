@@ -22,7 +22,7 @@ async function connectionRabbitMq() {
       const channel = await connection.createChannel();
 
       await channel.assertExchange(exchange_rabbit, "direct", {
-        durable: false
+        durable: true
       });
 
       const queue = await channel.assertQueue(rabbitmq_name, {
@@ -35,7 +35,6 @@ async function connectionRabbitMq() {
       channel.consume(queue.queue, (message) => {
         if (message !== null) {
           const routingKey = message.fields.routingKey;
-          console.log(JSON.parse(message.content.toString()));
           const message_json = JSON.parse(message.content.toString());
           switch (routingKey) {
             case event_one:
@@ -49,11 +48,8 @@ async function connectionRabbitMq() {
                 }
               ));
               break;
-
             case event_two:
-              console.log(message.content.toString());
               break;
-
             default:
               break;
           }
