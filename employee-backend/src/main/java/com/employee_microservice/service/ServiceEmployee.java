@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.employee_microservice.api.MicroserviceDepartment;
+import com.employee_microservice.exception.DeleteEmployeeExceptions;
 import com.employee_microservice.model.dto.EmployeeDtoRequest;
 import com.employee_microservice.model.dto.EmployeeDtoResponse;
+import com.employee_microservice.model.dto.MessageRabbitDeleteEmployee;
 import com.employee_microservice.model.dto.MessageRabbitMq;
 import com.employee_microservice.model.entitys.Employee;
 import com.employee_microservice.repository.EmployeeRepository;
@@ -63,6 +65,19 @@ public class ServiceEmployee implements interfaceEmployee {
         employee.getNameOne() + employee.getOtherName() + employee.getFirstSurname() + employee.getSecondSurname(),
         employee.getEmail(), employee.getIdDepartment(), LocalDateTime.now());
     serviceRabbitMq.senMessageAndBrokerRabbitMq(messageRabbitMq);
+  }
+
+  @Override
+  public void deleteEmployee(Long id_employee) throws DeleteEmployeeExceptions {
+    Optional<Employee> get_employee = Employeerepository.findById(id_employee);
+    if (get_employee.isEmpty())
+      throw new DeleteEmployeeExceptions("Employee not found ");
+    Employee emplo = get_employee.get();
+    String name_complete_employee = emplo.getFirstSurname() + " " + emplo.getOtherName() + " " + emplo.getFirstSurname()
+        + " " + emplo.getSecondSurname();
+    MessageRabbitDeleteEmployee mDeleteEmployee = new MessageRabbitDeleteEmployee(emplo.getIdEmployee(),
+        name_complete_employee, emplo.getEmail());
+    serviceRabbitMq.sendMessageDeleteEmployee(mDeleteEmployee);
   }
 
 }

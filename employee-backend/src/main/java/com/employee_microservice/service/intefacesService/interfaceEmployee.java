@@ -3,6 +3,7 @@ package com.employee_microservice.service.intefacesService;
 import java.io.IOException;
 import java.util.Optional;
 
+import com.employee_microservice.exception.DeleteEmployeeExceptions;
 import com.employee_microservice.model.dto.EmployeeDtoRequest;
 import com.employee_microservice.model.dto.EmployeeDtoResponse;
 import com.employee_microservice.model.entitys.Employee;
@@ -27,4 +28,6 @@ public interface interfaceEmployee {
       throws IOException, InterruptedException;
 
   public void sendMessageToBroker(Employee employee);
+
+  public void deleteEmployee(Long id_employee) throws DeleteEmployeeExceptions;
 }
