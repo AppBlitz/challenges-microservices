@@ -48,9 +48,11 @@ async function connectionRabbitMq() {
                   date_enter: message_json.dateEnter
                 }
               ));
+              console.log("NOTIFICATION" + " Tipo:BIENVENIDA | " + "para: " + message_json.email_employee + " Mensaje: Bienvenido" + message_json.name_employee)
               break;
             case event_two:
               const employee_delete = new DeleteEmployee(message_json.id_employee, message_json.name_employee, message_json.email_employee);
+              console.log("[NOTIFICATION]" + " tipo: DESVINCULACIÓN" + " para: " + employee_delete.getEmail() + " | " + "Mensaje: Su cuenta ha sido aliminada " + employee_delete.getName())
               break;
             default:
               break;
