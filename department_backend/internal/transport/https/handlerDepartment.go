@@ -1,4 +1,3 @@
-// Package https
 package https
 
 import (
@@ -16,6 +15,7 @@ import (
 type DepartmentHandler struct {
 	service *service.DepartmentService
 }
+
 type ErrorResponse struct {
 	Error string `json:"error"`
 }
@@ -24,6 +24,16 @@ func NewDepartmentHandler(s *service.DepartmentService) *DepartmentHandler {
 	return &DepartmentHandler{service: s}
 }
 
+// @Summary Department successful saved
+// @Description Save a new department in the system
+// @Tags Departments
+// @Accept json
+// @Produce json
+// @Param department body model.Department true "Department data"
+// @Success 201 {string} string "Department save success"
+// @Failure 405 {object} ErrorResponse "Method not allowed"
+// @Failure 500 {object} ErrorResponse "Bad request or internal error"
+// @Router /department/save/ [post]
 func (serviceDepart *DepartmentHandler) SaveDepartments(w http.ResponseWriter, r *http.Request) {
 	departmentModel := &model.Department{}
 	defer func() {
@@ -49,10 +59,9 @@ func (serviceDepart *DepartmentHandler) SaveDepartments(w http.ResponseWriter, r
 		}
 		erro = serviceDepart.service.SaveDepartment(departmentModel)
 		if erro != nil {
-			log.Println("ERROR GUARDANDO:", erro) // 👈 MUY IMPORTANTE
 			w.WriteHeader(http.StatusInternalServerError)
 			_ = json.NewEncoder(w).Encode(ErrorResponse{
-				Error: erro.Error(), // 👈 devuelve el error real
+				Error: erro.Error(),
 			})
 			return
 		}
@@ -65,6 +74,16 @@ func (serviceDepart *DepartmentHandler) SaveDepartments(w http.ResponseWriter, r
 	}
 }
 
+// @Summary Get department by ID
+// @Description Retrieve a department using its ID
+// @Tags Departments
+// @Produce json
+// @Param id path int true "Department ID"
+// @Success 200 {object} model.Department
+// @Failure 400 {object} ErrorResponse "ID no valid"
+// @Failure 405 {object} ErrorResponse "Method not allowed"
+// @Failure 500 {object} ErrorResponse "Department not found or internal error"
+// @Router /department/search/{id}/ [get]
 func (serviceDepart *DepartmentHandler) DepartmentID(w http.ResponseWriter, r *http.Request) {
 	configs.EnableCors(w)
 	w.Header().Set("Content-Type", "application/json")
@@ -100,6 +119,14 @@ func (serviceDepart *DepartmentHandler) DepartmentID(w http.ResponseWriter, r *h
 	}
 }
 
+// @Summary Get all departments
+// @Description Retrieve all departments from the system
+// @Tags Departments
+// @Produce json
+// @Success 200 {array} model.Department
+// @Failure 405 {object} ErrorResponse "Method not allowed"
+// @Failure 500 {object} ErrorResponse "Server error"
+// @Router /department/all/ [get]
 func (serviceDepart *DepartmentHandler) FindAllDepartments(w http.ResponseWriter, r *http.Request) {
 	configs.EnableCors(w)
 	w.Header().Set("Content-Type", "application/json")
