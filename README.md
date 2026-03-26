@@ -29,6 +29,39 @@ El despliegue se realiza mediante Docker Compose, permitiendo la orquestación s
 * **Variables de Entorno:** Es fundamental configurar correctamente las variables en el archivo docker-compose.yml.
 * **Comunicación Sincrónica:** La conexión entre Empleados y Departamentos es de tipo bloqueante; el primer servicio espera la validación del segundo antes de confirmar la respuesta al usuario final.
 
+
+### ¿Por qué se escogio rabbitMq?
+Primodrialmente se escogio debido a su alta documentación, facilidad de uso y que no  al grupo no se le hacia tan dificíl la implementación en los diferentes lenguajes que estamos utilzando para utilizar este broker.
+#### lenguajes de programación que se está utilzando
+* **java:**  Java es el lenguaje de programación que se encarga de publicar los diferentes eventos 
+* **javascript:** Se encarga de capturar los eventos que se lanzan y los almacena en una base de datos como un log
+* **c#:** Se encarga de la captura de los eventos que lanza java y crear un usuario con los datos que recibe 
+
+### Explicación de los json que se utilizaron para los eventos
+#### Evento de guardar empleado 
+
+
+```json
+
+{
+  "id":"{id employee}",
+  "nameUser":"{name employee}",
+  "email":"{email employee}",
+  "departmentID":"{departmentID}",
+  "dateEnter":"{date register employee}"
+}
+```
+
+#### Evento cuando se elima un empleado email
+
+```json
+
+{
+  "id_employee":"{id employee}",
+  "name_employee":"{name employee}",
+  "email":"{email employee}",
+}
+```
 ---
 
 ## English
@@ -52,3 +85,48 @@ This service manages department entities, allowing for their creation and retrie
 Deployment is managed through Docker Compose, allowing for the simultaneous orchestration of all services:
 * **Environment Variables:** It is essential to correctly configure the environment variables within the docker-compose.yml file.
 * **Synchronous Communication:** The connection between Employees and Departments is blocking (synchronous), as the first service must wait for validation from the second before confirming the final response.
+
+
+## 📌 Why was RabbitMQ chosen?
+
+RabbitMQ was primarily chosen due to its extensive documentation, ease of use, and because it was not too difficult for the team to implement across the different programming languages used in the project.
+
+---
+
+## 📌 Programming languages used
+
+- **Java**: Responsible for publishing the different events.  
+- **JavaScript**: Handles capturing the emitted events and storing them in a database as logs.  
+- **C#**: Responsible for consuming events published by Java and creating users based on the received data.  
+
+---
+
+## 📌 Explanation of the JSON used for events
+
+This section describes the structure of the JSON used to represent events in the system.
+
+### 🧾 Example: Employee creation event
+
+
+
+```json
+
+{
+  "id":"{id employee}",
+  "nameUser":"{name employee}",
+  "email":"{email employee}",
+  "departmentID":"{departmentID}",
+  "dateEnter":"{date register employee}"
+}
+```
+
+#### When an employee is deleted
+
+```json
+
+{
+  "id_employee":"{id employee}",
+  "name_employee":"{name employee}",
+  "email":"{email employee}",
+}
+```
