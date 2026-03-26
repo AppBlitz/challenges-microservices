@@ -18,12 +18,5 @@ const options = {
 
 const openapiSpecification = swaggerJsdoc(options);
 
-// DEBUGGING LOGS: This will appear in your terminal
-console.log("-----------------------------------------");
-console.log("SWAGGER DEBUG INFO:");
-console.log("Working Directory:", process.cwd());
-console.log("Looking for files in:", path.resolve("src/controller/*.js"));
-console.log("Total Paths found:", Object.keys(openapiSpecification.paths || {}).length);
-console.log("-----------------------------------------");
 
 export default openapiSpecification;
