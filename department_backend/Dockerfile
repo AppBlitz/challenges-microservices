@@ -21,6 +21,7 @@ COPY . .
 # Verifica que los archivos Go existan
 # RUN ls -la /build
 
+
 # Compila el binario
 RUN go build -o /app/myapp ./cmd/app/main.go
 

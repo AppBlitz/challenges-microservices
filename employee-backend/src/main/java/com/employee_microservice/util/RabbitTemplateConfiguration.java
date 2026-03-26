@@ -23,7 +23,6 @@ public class RabbitTemplateConfiguration {
     @Value("${spring.rabbitmq.event_one}")
     private String event_one;
 
-
     @Bean
     public DirectExchange direct() {
         return new DirectExchange(direct_exchange.toString());

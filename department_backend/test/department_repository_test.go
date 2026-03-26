@@ -1,3 +1,5 @@
+// Package test contiene las pruebas unitarias y de integración para validar
+// el comportamiento de repositorios y servicios.
 package test
 
 import (
@@ -8,6 +10,7 @@ import (
 	"github.com/AppBlitz/department_backend/internal/repository"
 )
 
+// TestGetDepartmentID valida que se pueda recuperar un departamento por ID.
 func TestGetDepartmentID(t *testing.T) {
 	db, _ := mysqls.ConnectionDatabaseMysql()
 	repo := repository.NewDepartmentRepository(db)
@@ -17,6 +20,7 @@ func TestGetDepartmentID(t *testing.T) {
 	}
 }
 
+// TestFindAllDepartments valida la recuperación de la lista completa de departamentos.
 func TestFindAllDepartments(t *testing.T) {
 	db, _ := mysqls.ConnectionDatabaseMysql()
 	repo := repository.NewDepartmentRepository(db)
@@ -26,6 +30,7 @@ func TestFindAllDepartments(t *testing.T) {
 	}
 }
 
+// Test_save_department valida que el guardado de un nuevo departamento sea exitoso.
 func Test_save_department(t *testing.T) {
 	models := &model.Department{ID: "124579", Name: "Software", Description: "es un departamento de desarrollo de software de la empresa"}
 	db, _ := mysqls.ConnectionDatabaseMysql()

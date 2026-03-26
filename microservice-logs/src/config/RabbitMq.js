@@ -1,5 +1,6 @@
 import { connect, credentials } from "amqplib"
 import { insert_log_save_employee } from "../services/service_logs.js"
+import DeleteEmployee from "../model/model_event_employee_delete.js"
 
 const user_rabbit = process.env.RABBITMQ_USER
 const password_rabbit = process.env.RABBITMQ_PASSWORD
@@ -22,7 +23,7 @@ async function connectionRabbitMq() {
       const channel = await connection.createChannel();
 
       await channel.assertExchange(exchange_rabbit, "direct", {
-        durable: false
+        durable: true
       });
 
       const queue = await channel.assertQueue(rabbitmq_name, {
@@ -35,7 +36,6 @@ async function connectionRabbitMq() {
       channel.consume(queue.queue, (message) => {
         if (message !== null) {
           const routingKey = message.fields.routingKey;
-          console.log(JSON.parse(message.content.toString()));
           const message_json = JSON.parse(message.content.toString());
           switch (routingKey) {
             case event_one:
@@ -49,11 +49,9 @@ async function connectionRabbitMq() {
                 }
               ));
               break;
-
             case event_two:
-              console.log(message.content.toString());
+              const employee_delete = new DeleteEmployee(message_json.id_employee, message_json.name_employee, message_json.email_employee);
               break;
-
             default:
               break;
           }
