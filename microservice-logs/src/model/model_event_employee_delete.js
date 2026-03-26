@@ -14,7 +14,7 @@ export default class DeleteEmployee {
    * Creates an instance of DeleteEmployee.
    *
    * @constructor
-   * @param {number|string} id_employee - Unique identifier of the employee
+   * @param {number} id_employee - Unique identifier of the employee
    * @param {string} name_employee - Name of the employee
    * @param {string} email_employee - Email address of the employee
    */
