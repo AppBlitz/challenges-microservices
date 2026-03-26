@@ -6,6 +6,7 @@ function insert_log_save_employee(log_employee_save) {
   save_employee_save_logs(employee_log_save)
 }
 
+
 function search_log() {
   return search_all_logs;
 }

@@ -1,5 +1,6 @@
 import { connect, credentials } from "amqplib"
 import { insert_log_save_employee } from "../services/service_logs.js"
+import DeleteEmployee from "../model/model_event_employee_delete.js"
 
 const user_rabbit = process.env.RABBITMQ_USER
 const password_rabbit = process.env.RABBITMQ_PASSWORD
@@ -36,7 +37,6 @@ async function connectionRabbitMq() {
         if (message !== null) {
           const routingKey = message.fields.routingKey;
           const message_json = JSON.parse(message.content.toString());
-          console.log(routingKey)
           switch (routingKey) {
             case event_one:
               insert_log_save_employee(JSON.stringify(
@@ -50,6 +50,7 @@ async function connectionRabbitMq() {
               ));
               break;
             case event_two:
+              const employee_delete = new DeleteEmployee(message_json.id_employee, message_json.name_employee, message_json.email_employee);
               break;
             default:
               break;
