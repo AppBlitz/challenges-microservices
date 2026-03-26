@@ -1,3 +1,5 @@
+// Package test contains automated tests to verify the functionality
+// of the application's services and repositories.
 package test
 
 import (
@@ -9,6 +11,8 @@ import (
 	"github.com/AppBlitz/department_backend/internal/service"
 )
 
+// TestServiceGetIDdepartment verifies that the SearchDepartmentID method
+// successfully retrieves a department by its identifier.
 func TestServiceGetIDdepartment(t *testing.T) {
 	db, _ := mysqls.ConnectionDatabaseMysql()
 	repo := repository.NewDepartmentRepository(db)
@@ -19,6 +23,8 @@ func TestServiceGetIDdepartment(t *testing.T) {
 	}
 }
 
+// TestAllDepartments verifies that the FinAllDepartments method
+// successfully retrieves all department records from the database.
 func TestAllDepartments(t *testing.T) {
 	db, _ := mysqls.ConnectionDatabaseMysql()
 	repo := repository.NewDepartmentRepository(db)
@@ -29,6 +35,8 @@ func TestAllDepartments(t *testing.T) {
 	}
 }
 
+// TestSaveDepartmentOfService verifies that a new department model
+// can be correctly persisted to the database through the service layer.
 func TestSaveDepartmentOfService(t *testing.T) {
 	models := &model.Department{ID: "124568", Name: "Software", Description: "es un departamento de desarrollo de software de la empresa"}
 	db, _ := mysqls.ConnectionDatabaseMysql()

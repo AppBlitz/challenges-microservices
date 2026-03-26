@@ -1,4 +1,5 @@
-// Package myslqs is
+// Package mysqls provides utilities for establishing and managing
+// connections to a MySQL database using environment variables.
 package mysqls
 
 import (
@@ -10,6 +11,8 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
+// configConnectionDatabaseMysql populates a MySQL configuration structure
+// using values retrieved from the system's environment variables.
 func configConnectionDatabaseMysql() *mysql.Config {
 	cfg := mysql.NewConfig()
 	cfg.User = os.Getenv("MYSQL_USER")
@@ -20,6 +23,8 @@ func configConnectionDatabaseMysql() *mysql.Config {
 	return cfg
 }
 
+// configHandleDatabaseMysql creates a database handle (sql.DB) by
+// formatting a Data Source Name (DSN) from the configuration.
 func configHandleDatabaseMysql() (sqls *sql.DB, err error) {
 	cfg := configConnectionDatabaseMysql()
 
@@ -30,6 +35,9 @@ func configHandleDatabaseMysql() (sqls *sql.DB, err error) {
 	return sqls, nil
 }
 
+// ConnectionDatabaseMysql attempts to connect to the MySQL database.
+// It includes a retry mechanism that pings the database up to 10 times
+// before returning an error and sets connection pool limits upon success.
 func ConnectionDatabaseMysql() (*sql.DB, error) {
 	db, err := configHandleDatabaseMysql()
 	if err != nil {
@@ -37,15 +45,17 @@ func ConnectionDatabaseMysql() (*sql.DB, error) {
 	}
 
 	maxRetries := 10
+	// This loop uses the integer range feature (Go 1.22+) to attempt connection retries
 	for range maxRetries {
-		// Intentamos conectar silenciosamente
+		// Attempting to connect silently
 		if err := db.Ping(); err == nil {
-			// Conexión exitosa
+			// Successful connection established
 			db.SetMaxOpenConns(4)
 			db.SetMaxIdleConns(2)
 			return db, nil
 		}
 
+		// Wait for 2 seconds before the next attempt
 		time.Sleep(2 * time.Second)
 	}
 
