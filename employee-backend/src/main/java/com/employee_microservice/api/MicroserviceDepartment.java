@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * This component handles the communication with the Department microservice.
- * It serves as a client to verify the availability or existence of data 
+ * It serves as a client to verify the availability or existence of data
  * through HTTP requests.
  */
 @Component
@@ -22,10 +22,13 @@ public class MicroserviceDepartment {
 
     /**
      * Sends a GET request to a specified URI to validate the department data.
-     * * @param uri The full web address (Uniform Resource Identifier) to be queried.
-     * @return {@code true} if the server returns a successful 200 OK status; 
-     * {@code false} otherwise.
-     * @throws IOException If an I/O error occurs when sending or receiving.
+     * * @param uri The full web address (Uniform Resource Identifier) to be
+     * queried.
+     * 
+     * @return {@code true} if the server returns a successful 200 OK status;
+     *         {@code false} otherwise.
+     * @throws IOException          If an I/O error occurs when sending or
+     *                              receiving.
      * @throws InterruptedException If the operation is interrupted.
      */
     public boolean dataMicroserviceDepartment(String uri) throws IOException, InterruptedException {
@@ -34,9 +37,9 @@ public class MicroserviceDepartment {
                 .GET()
                 .uri(URI.create(uri))
                 .build();
-        
+
         HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-        
+
         if (response.statusCode() != 200) {
             return false;
         } else {

@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	// The blank import is used here to initialize the swagger documentation package.
+	// _ "github.com/AppBlitz/department_backend/docs"
 	_ "github.com/AppBlitz/department_backend/docs"
-
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 

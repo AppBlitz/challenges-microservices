@@ -2,7 +2,6 @@
 db-init/
 db-init-postgres/
 mi_data_postgres/
-cassandra_data/
 # Node modules
 node_modules/
 
