@@ -1,11 +1,10 @@
-FROM gradle:9.3.0-jdk21 AS build
+FROM gradle:9.4.1-jdk-alpine as build
 
 WORKDIR /home/gradle/src
 
-
 COPY . .
 
-RUN ./gradlew bootJar -x test
+RUN ./gradlew bootJar +x test
 
 
 FROM eclipse-temurin:21-jre
@@ -18,10 +17,3 @@ COPY  --from=build /home/gradle/src/build/libs/*-SNAPSHOT.jar app.jar
 EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
-
-
-
-
-
-
-
