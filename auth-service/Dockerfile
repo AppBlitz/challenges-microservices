@@ -14,5 +14,4 @@ WORKDIR  /app
 COPY  --from=build /home/gradle/src/build/libs/*-SNAPSHOT.jar app.jar
 
 
-
 ENTRYPOINT ["java", "-jar", "app.jar"]
