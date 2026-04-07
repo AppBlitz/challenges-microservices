@@ -1,5 +1,6 @@
 package com.employee_microservice.controller;
 
+import java.util.List;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.employee_microservice.model.dto.EmployeeDtoRequest;
 import com.employee_microservice.model.dto.EmployeeDtoResponse;
 import com.employee_microservice.service.ServiceEmployee;
@@ -44,6 +46,14 @@ public class ControllerEmployee {
     return ResponseEntity.ok(response.get());
   }
 
-  // @GetMapping("/all")
+  @GetMapping("/all/")
+  public ResponseEntity<List<EmployeeDtoResponse>> get_all_employees() {
+    List<EmployeeDtoResponse> list_employees = serviceEmployee.get_all_employee();
+    if (list_employees.isEmpty()) {
+      return ResponseEntity.status(204).body(list_employees);
+    } else {
+      return ResponseEntity.status(200).body(list_employees);
+    }
+  }
 
 }
