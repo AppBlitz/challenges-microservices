@@ -30,4 +30,6 @@ public interface interfaceEmployee {
   public void sendMessageToBroker(Employee employee);
 
   public void deleteEmployee(Long id_employee) throws DeleteEmployeeExceptions;
+
+  public void send_message_delete_employee(Employee emplo);
 }

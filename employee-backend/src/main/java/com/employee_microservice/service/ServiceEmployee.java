@@ -73,8 +73,15 @@ public class ServiceEmployee implements interfaceEmployee {
     if (get_employee.isEmpty())
       throw new DeleteEmployeeExceptions("Employee not found ");
     Employee emplo = get_employee.get();
+    Employeerepository.delete(emplo);
+    send_message_delete_employee(emplo);
+  }
+
+  @Override
+  public void send_message_delete_employee(Employee emplo) {
     String name_complete_employee = emplo.getFirstSurname() + " " + emplo.getOtherName() + " " + emplo.getFirstSurname()
         + " " + emplo.getSecondSurname();
+
     MessageRabbitDeleteEmployee mDeleteEmployee = new MessageRabbitDeleteEmployee(emplo.getIdEmployee(),
         name_complete_employee, emplo.getEmail());
     serviceRabbitMq.sendMessageDeleteEmployee(mDeleteEmployee);
