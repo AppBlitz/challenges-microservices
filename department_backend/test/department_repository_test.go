@@ -32,7 +32,7 @@ func TestFindAllDepartments(t *testing.T) {
 
 // Test_save_department valida que el guardado de un nuevo departamento sea exitoso.
 func Test_save_department(t *testing.T) {
-	models := &model.Department{ID: "124579", Name: "Software", Description: "es un departamento de desarrollo de software de la empresa"}
+	models := &model.Department{ID: 12345678, Name: "Software", Description: "es un departamento de desarrollo de software de la empresa"}
 	db, _ := mysqls.ConnectionDatabaseMysql()
 	repos := repository.NewDepartmentRepository(db)
 	err := repos.Save(models)

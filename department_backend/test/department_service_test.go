@@ -38,7 +38,7 @@ func TestAllDepartments(t *testing.T) {
 // TestSaveDepartmentOfService verifies that a new department model
 // can be correctly persisted to the database through the service layer.
 func TestSaveDepartmentOfService(t *testing.T) {
-	models := &model.Department{ID: "124568", Name: "Software", Description: "es un departamento de desarrollo de software de la empresa"}
+	models := &model.Department{ID: 12345678, Name: "Software", Description: "es un departamento de desarrollo de software de la empresa"}
 	db, _ := mysqls.ConnectionDatabaseMysql()
 	repos := repository.NewDepartmentRepository(db)
 	servi := service.NewDepartmentService(repos)
