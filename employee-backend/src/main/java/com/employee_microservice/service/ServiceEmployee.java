@@ -88,13 +88,10 @@ public class ServiceEmployee implements interfaceEmployee {
     serviceRabbitMq.sendMessageDeleteEmployee(mDeleteEmployee);
   }
 
+  @Override
   public List<EmployeeDtoResponse> get_all_employee() {
     List<Employee> list_employees = Employeerepository.findAll();
-    if (!list_employees.isEmpty()) {
-
-    }
     return mapperEmployee.return_employee_list_employee_dto_response(list_employees);
-
   }
 
 }

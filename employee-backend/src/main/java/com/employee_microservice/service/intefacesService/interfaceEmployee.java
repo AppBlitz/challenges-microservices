@@ -1,5 +1,6 @@
 package com.employee_microservice.service.intefacesService;
 
+import java.util.List;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -32,4 +33,7 @@ public interface interfaceEmployee {
   public void deleteEmployee(Long id_employee) throws DeleteEmployeeExceptions;
 
   public void send_message_delete_employee(Employee emplo);
+
+  public List<EmployeeDtoResponse> get_all_employee();
+
 }
