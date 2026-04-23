@@ -1,4 +1,17 @@
 services:
+  db-profile:
+    image: postgres:16
+    container_name: postgres-db-management-profile
+    ports:
+      - ${POSTGRESQL_PROFILE_PORT_EXPOSE}:${POSTGRESQL_PROFILE_PORT_INTER}
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRESQL_PROFILE_P}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PROFILE_PASSWORD}
+      POSTGRES_DB: ${POSTGRESQL_PROFILE_DB}
+    volumes:
+      - ${POSTGRESQL_PROFILE_VOLUMEN_DATA_SAVE}
   db-logs:
     image: mongo
     restart: unless-stopped
@@ -6,10 +19,10 @@ services:
       - ${MONGO_DOCKER_EXPOSE_PORT}:${MONGO_PORT_DOCKER}
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${USERNAME_MONGO}
-      MONGO_INITDB_ROOT_PASSWORD : ${PASSWORD_USERNAME_MONGO}
-      MONGO_INITDB_DATABASE : ${DATABASE_NAME_MONGO}
+      MONGO_INITDB_ROOT_PASSWORD: ${PASSWORD_USERNAME_MONGO}
+      MONGO_INITDB_DATABASE: ${DATABASE_NAME_MONGO}
     volumes:
-       - ${VOLUME_STORE_DATA}
+      - ${VOLUME_STORE_DATA}
   db-e:
     image: postgres:18
     restart: unless-stopped
@@ -44,7 +57,7 @@ services:
       - ${MYSQL_PORT_EXPOSE}:${MYSQL_PORT}
     volumes:
       - ${VOLUMES_DB_SAVE}
-      - ${VOLUME_CREATE_DATABASES} 
+      - ${VOLUME_CREATE_DATABASES}
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 4s
@@ -53,11 +66,11 @@ services:
 
   service-departments:
     depends_on:
-      db-d: 
+      db-d:
         condition: service_healthy
     build: ./department_backend/
     env_file:
-    - .env
+      - .env
     restart: on-failure
     ports:
       - ${PORT_EXPOSE_SERVICE_DEPARTMENTS}:${PORT_DOCKER}
@@ -71,7 +84,7 @@ services:
 
   service-employees:
     depends_on:
-      db-e: 
+      db-e:
         condition: service_healthy
       service-rabbitmq:
         condition: service_healthy
@@ -99,10 +112,10 @@ services:
       EVENT_TWO: ${EVENT_TWO}
       DIRECT_EXCHANGE: ${EXCHANGE_RABBIT}
       URI_SERVICE_D: http://service-departments:${PORT_DOCKER}
- 
+
   service-rabbitmq:
     env_file:
-    - .env
+      - .env
     image: rabbitmq:4.2.4-management-alpine
     ports:
       - ${PORTS_CLIENT_RABBIT_EXPOSE}:${PORTS_CLIENT_RABBIT_DOCKER}
@@ -125,22 +138,37 @@ services:
     ports:
       - 8085:8080
     environment:
-     RABBITMQ_USER: ${RABBITMQ_DEFAULT_USER} 
-     RABBITMQ_PASSWORD: ${RABBITMQ_DEFAULT_PASS}
-     RABBITMQ_ADDRESS: service-rabbitmq
-     RABBITMQ_PORT: ${PORTS_CLIENT_RABBIT_DOCKER}
-     EXCHANGE_RABBIT: ${EXCHANGE_RABBIT}
-     EVENT_ONE: ${EVENT_ONE}
-     EVENT_TWO: ${EVENT_TWO}
-     RABBITMQ_HOST: db-logs
-     RABBITMQ_NAME: ${NAME_QUEUE}
-     MONGO_INITDB_ROOT_USERNAME: ${USERNAME_MONGO}
-     MONGO_INITDB_ROOT_PASSWORD : ${PASSWORD_USERNAME_MONGO}
-     MONGO_INITDB_DATABASE : ${DATABASE_NAME_MONGO}
+      RABBITMQ_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_DEFAULT_PASS}
+      RABBITMQ_ADDRESS: service-rabbitmq
+      RABBITMQ_PORT: ${PORTS_CLIENT_RABBIT_DOCKER}
+      EXCHANGE_RABBIT: ${EXCHANGE_RABBIT}
+      EVENT_ONE: ${EVENT_ONE}
+      EVENT_TWO: ${EVENT_TWO}
+      RABBITMQ_HOST: db-logs
+      RABBITMQ_NAME: ${NAME_QUEUE}
+      MONGO_INITDB_ROOT_USERNAME: ${USERNAME_MONGO}
+      MONGO_INITDB_ROOT_PASSWORD: ${PASSWORD_USERNAME_MONGO}
+      MONGO_INITDB_DATABASE: ${DATABASE_NAME_MONGO}
     depends_on:
       service-rabbitmq:
         condition: service_healthy
+
+  service-profile:
+    env_file:
+      - .env
+    build:
+      context: ./management_profile/
+      dockerfile: Dockerfile
+    ports:
+      - ${SERVICE_PROFILE_PORT_EXPOSE}:${SERVICE_PROFILE_PORT_INTERN}
+    environment:
+      - DB_CONNECTION_STRING=Host=postgres;Database=profiles_db;Username=user_db;Password=1234
+    depends_on:
+      - db-profile
+
 volumes:
   postgres-data:
   mysql-data:
   db-logs:
+  postgres_data:
