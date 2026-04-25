@@ -11,10 +11,11 @@ import (
 	"github.com/AppBlitz/department_backend/internal/service"
 )
 
+var db, _ = mysqls.ConnectionDatabaseMysql()
+
 // TestServiceGetIDdepartment verifies that the SearchDepartmentID method
 // successfully retrieves a department by its identifier.
 func TestServiceGetIDdepartment(t *testing.T) {
-	db, _ := mysqls.ConnectionDatabaseMysql()
 	repo := repository.NewDepartmentRepository(db)
 	servi := service.NewDepartmentService(repo)
 	_, err := servi.SearchDepartmentID(1234)

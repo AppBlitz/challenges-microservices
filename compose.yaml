@@ -79,7 +79,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DBNET: ${MYSQL_DBNET}
       PORT_LISTEN: ${PORT_DOCKER}
-      MYSQL_DBADDR: db-d:${MYSQL_PORT}
+      MYSQL_DBADDR: db-d
       MYSQL_DATABASE: ${MYSQL_DATABASE}
 
   service-employees:
