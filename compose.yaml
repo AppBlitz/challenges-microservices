@@ -129,6 +129,31 @@ services:
       start_period: 4s
       retries: 3
 
+  auth-service:
+    build: ./auth-service/
+    restart: on-failure
+    env_file:
+      - .env
+    ports:
+      - ${PORT_AUTH_EXPOSE}:${PORT_AUTH_DOCKER}
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-e:${POSTGRES_PORT_DOCKER}/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      RABBITMQ_HOST: service-rabbitmq
+      RABBITMQ_PORT: ${PORTS_CLIENT_RABBIT_DOCKER}
+      RABBITMQ_USERNAME: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_DEFAULT_PASS}
+      EXCHANGE_RABBIT: ${EXCHANGE_RABBIT}
+      EVENT_ONE: ${EVENT_ONE}
+      EVENT_TWO: ${EVENT_TWO}
+    depends_on:
+      db-e:
+        condition: service_healthy
+      service-rabbitmq:
+        condition: service_healthy
+
   service-logs:
     env_file:
       - .env
