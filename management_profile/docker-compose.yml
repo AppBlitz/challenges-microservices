@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  api:
+    build: .
+    container_name: management-profile-api
+  postgres:
+    image: postgres:16
+    container_name: postgres-db-management-profile
+    environment:
+      POSTGRES_USER: user_db
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: profiles_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:

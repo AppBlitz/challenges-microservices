@@ -1,4 +1,17 @@
 services:
+  db-profile:
+    image: postgres:16
+    container_name: postgres-db-management-profile
+    ports:
+      - ${POSTGRESQL_PROFILE_PORT_EXPOSE}:${POSTGRESQL_PROFILE_PORT_INTER}
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRESQL_PROFILE_P}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PROFILE_PASSWORD}
+      POSTGRES_DB: ${POSTGRESQL_PROFILE_DB}
+    volumes:
+      - ${POSTGRESQL_PROFILE_VOLUMEN_DATA_SAVE}
   db-logs:
     image: mongo
     restart: unless-stopped
@@ -66,7 +79,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DBNET: ${MYSQL_DBNET}
       PORT_LISTEN: ${PORT_DOCKER}
-      MYSQL_DBADDR: db-d:${MYSQL_PORT}
+      MYSQL_DBADDR: db-d
       MYSQL_DATABASE: ${MYSQL_DATABASE}
 
   service-employees:
@@ -165,7 +178,22 @@ services:
     depends_on:
       service-rabbitmq:
         condition: service_healthy
+
+  service-profile:
+    env_file:
+      - .env
+    build:
+      context: ./management_profile/
+      dockerfile: Dockerfile
+    ports:
+      - ${SERVICE_PROFILE_PORT_EXPOSE}:${SERVICE_PROFILE_PORT_INTERN}
+    environment:
+      - DB_CONNECTION_STRING=Host=postgres;Database=profiles_db;Username=user_db;Password=1234
+    depends_on:
+      - db-profile
+
 volumes:
   postgres-data:
   mysql-data:
   db-logs:
+  postgres_data:
