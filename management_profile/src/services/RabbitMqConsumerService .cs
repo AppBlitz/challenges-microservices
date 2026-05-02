@@ -43,7 +43,9 @@ public class RabbitMqConsumerService : BackgroundService
             /// <summary>
             /// Dirección del servidor RabbitMQ.
             /// </summary>
-            HostName = "localhost"
+            HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost",
+            UserName = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME") ?? "guest",
+            Password = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD") ?? "guest"
         };
 
         var connection = await factory.CreateConnectionAsync();

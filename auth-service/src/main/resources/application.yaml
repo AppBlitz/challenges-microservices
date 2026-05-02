@@ -19,3 +19,8 @@ spring:
 
 jwt:
   secret: ${JWT_SECRET:miClaveSuperSecreta}
+
+data_rabbit:
+  event_one: ${EVENT_ONE}
+  event_two: ${EVENT_TWO}
+  event_three: ${EVENT_THREE}
