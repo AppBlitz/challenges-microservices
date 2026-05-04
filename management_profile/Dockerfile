@@ -21,6 +21,5 @@ RUN apt-get update && apt-get install -y libkrb5-3 libgssapi-krb5-2 && rm -rf /v
 
 COPY --from=build /app .
 
-EXPOSE 8080
 ENTRYPOINT ["dotnet", "management_profile.dll"]
 

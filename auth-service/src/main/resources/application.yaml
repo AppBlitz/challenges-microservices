@@ -1,7 +1,7 @@
 # spring.application.name=auth-service
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/authdb
+    url: ${SPRING_DATASOURCE_URL}
     username: postgres
     password: postgres
   jpa:
@@ -12,12 +12,21 @@ spring:
       hibernate:
         format_sql: true
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
-
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
 
 jwt:
   secret: ${JWT_SECRET:miClaveSuperSecreta}
 
+data_rabbit:
+  event_one: ${EVENT_ONE}
+  event_two: ${EVENT_TWO}
+  event_three: ${EVENT_THREE}
+
+auth:
+  service:
+    email: ${AUTH_SERVICE_EMAIL}
+    password: ${AUTH_SERVICE_PASSWORD}
+    role: ${AUTH_SERVICE_ROLE}

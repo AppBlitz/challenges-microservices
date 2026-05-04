@@ -3,6 +3,8 @@
 package test
 
 import (
+	"database/sql"
+	"log"
 	"testing"
 
 	"github.com/AppBlitz/department_backend/internal/database/mysqls"
@@ -10,33 +12,39 @@ import (
 	"github.com/AppBlitz/department_backend/internal/repository"
 )
 
-// TestGetDepartmentID valida que se pueda recuperar un departamento por ID.
-func TestGetDepartmentID(t *testing.T) {
-	db, _ := mysqls.ConnectionDatabaseMysql()
-	repo := repository.NewDepartmentRepository(db)
-	_, err := repo.FindByID(1234)
-	if err != nil {
-		t.Error(err)
-	}
+type Connections struct {
+	Connection *sql.DB
 }
 
-// TestFindAllDepartments valida la recuperación de la lista completa de departamentos.
-func TestFindAllDepartments(t *testing.T) {
-	db, _ := mysqls.ConnectionDatabaseMysql()
-	repo := repository.NewDepartmentRepository(db)
-	_, err := repo.FindAll()
-	if err != nil {
-		t.Error(err)
+func ReadyConnection() *Connections {
+	database, er := mysqls.ConnectionDatabaseMysql()
+	if er != nil {
+		log.Fatal("Erro in connection", er)
 	}
+	return &Connections{Connection: database}
 }
 
-// Test_save_department valida que el guardado de un nuevo departamento sea exitoso.
-func Test_save_department(t *testing.T) {
-	models := &model.Department{ID: 12345678, Name: "Software", Description: "es un departamento de desarrollo de software de la empresa"}
-	db, _ := mysqls.ConnectionDatabaseMysql()
-	repos := repository.NewDepartmentRepository(db)
-	err := repos.Save(models)
-	if err != nil {
-		t.Error(err)
-	}
+func (db *Connections) TestCRUD(t *testing.T) {
+	t.Run("save_department", func(t *testing.T) {
+		models := &model.Department{ID: 12345678, Name: "Software", Description: "es un departamento de desarrollo de software de la empresa"}
+		repos := repository.NewDepartmentRepository(db.Connection)
+		err := repos.Save(models)
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
+	t.Run("search_department", func(t *testing.T) {
+		repo := repository.NewDepartmentRepository(db.Connection)
+		_, err := repo.FindByID(9870)
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
+	t.Run("receive_all_department", func(t *testing.T) {
+		repo := repository.NewDepartmentRepository(db.Connection)
+		_, err := repo.FindAll()
+		if err != nil {
+			t.Fatal(err)
+		}
+	})
 }

@@ -1,4 +1,26 @@
 services:
+  db-profile:
+    image: postgres:16
+    container_name: postgres-db-management-profile
+    ports:
+      - ${POSTGRESQL_PROFILE_PORT_EXPOSE}:${POSTGRESQL_PROFILE_PORT_INTER}
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRESQL_PROFILE_P}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PROFILE_PASSWORD}
+      POSTGRES_DB: ${POSTGRESQL_PROFILE_DB}
+    volumes:
+      - ${POSTGRESQL_PROFILE_VOLUMEN_DATA_SAVE}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRESQL_PROFILE_P} -d ${POSTGRESQL_PROFILE_DB}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   db-logs:
     image: mongo
     restart: unless-stopped
@@ -11,7 +33,7 @@ services:
     volumes:
       - ${VOLUME_STORE_DATA}
   db-e:
-    image: postgres:18
+    image: postgres:17
     restart: unless-stopped
     env_file:
       - .env
@@ -66,7 +88,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DBNET: ${MYSQL_DBNET}
       PORT_LISTEN: ${PORT_DOCKER}
-      MYSQL_DBADDR: db-d:${MYSQL_PORT}
+      MYSQL_DBADDR: db-d
       MYSQL_DATABASE: ${MYSQL_DATABASE}
 
   service-employees:
@@ -135,6 +157,10 @@ services:
       EXCHANGE_RABBIT: ${EXCHANGE_RABBIT}
       EVENT_ONE: ${EVENT_ONE}
       EVENT_TWO: ${EVENT_TWO}
+      EVENT_THREE: ${EVENT_THREE}
+      AUTH_SERVICE_EMAIL: ${AUTH_SERVICE_EMAIL}
+      AUTH_SERVICE_PASSWORD: ${AUTH_SERVICE_PASSWORD}
+      AUTH_SERVICE_ROLE: ${AUTH_SERVICE_ROLE}
     depends_on:
       db-e:
         condition: service_healthy
@@ -165,7 +191,24 @@ services:
     depends_on:
       service-rabbitmq:
         condition: service_healthy
+
+  service-profile:
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db-profile;Port=${POSTGRESQL_PROFILE_PORT_INTER};Database=${POSTGRESQL_PROFILE_DB};Username=${POSTGRESQL_PROFILE_P};Password=${POSTGRESQL_PROFILE_PASSWORD}
+      - RABBITMQ_HOST=service-rabbitmq
+      - RABBITMQ_USERNAME=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
+    build:
+      context: ./management_profile/
+      dockerfile: Dockerfile
+    ports:
+      - ${SERVICE_PROFILE_PORT_EXPOSE}:${SERVICE_PROFILE_PORT_INTERN}
+    depends_on:
+      db-profile:
+        condition: service_healthy
+
 volumes:
   postgres-data:
   mysql-data:
   db-logs:
+  postgres_data:

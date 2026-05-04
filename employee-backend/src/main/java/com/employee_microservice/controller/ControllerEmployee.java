@@ -33,7 +33,7 @@ public class ControllerEmployee {
   MapperEmployee mapperEmployee;
 
   @GetMapping(path = "/retrieve/{idEmployee}", produces = "application/json")
-  public ResponseEntity<EmployeeDtoResponse> retrieveEmployee(@PathVariable("idEmployee") Long idEmployee) {
+  public ResponseEntity<EmployeeDtoResponse> retrieveEmployee(@PathVariable() Long idEmployee) {
 
     return ResponseEntity.ok((serviceEmployee.getEmployeeForID(idEmployee)));
   }

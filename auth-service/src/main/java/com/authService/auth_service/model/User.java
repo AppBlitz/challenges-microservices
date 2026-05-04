@@ -1,8 +1,9 @@
 package com.authService.auth_service.model;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
-import org.springframework.data.annotation.Id;
 
 @Entity
 @Table(name = "users")
@@ -14,12 +15,11 @@ import org.springframework.data.annotation.Id;
 public class User {
 
     @Id
-    private String email;   // identificador único
+    private String email; // identificador único
 
     private String password; // se almacenará encriptada con BCrypt
 
-    private String role;     // ADMIN o USER
+    private String role; // ADMIN o USER
 
     private boolean enabled; // true si puede iniciar sesión
 }
-
