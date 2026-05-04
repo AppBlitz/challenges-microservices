@@ -2,7 +2,8 @@ import mongoose from "mongoose"
 const user_mongo = process.env.MONGO_INITDB_ROOT_USERNAME
 const user_password = process.env.MONGO_INITDB_ROOT_PASSWORD
 const name_database = process.env.MONGO_INITDB_DATABASE
-const host_database = process.env.RABBITMQ_HOST
+const host_database = process.env.MONGO_HOST
+console.log("this host of database of mongo", host_database);
 const uri = `mongodb://${user_mongo}:${user_password}@${host_database}/${name_database}?authSource=admin`
 const { Schema, connect } = mongoose
 connect(uri)

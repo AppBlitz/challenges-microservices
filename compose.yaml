@@ -22,7 +22,7 @@ services:
       timeout: 5s
       retries: 5
   db-logs:
-    image: mongo
+    image: mongo:8.2
     restart: unless-stopped
     ports:
       - ${MONGO_DOCKER_EXPOSE_PORT}:${MONGO_PORT_DOCKER}
@@ -188,6 +188,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${USERNAME_MONGO}
       MONGO_INITDB_ROOT_PASSWORD: ${PASSWORD_USERNAME_MONGO}
       MONGO_INITDB_DATABASE: ${DATABASE_NAME_MONGO}
+      MONGO_HOST: db-logs
     depends_on:
       service-rabbitmq:
         condition: service_healthy
