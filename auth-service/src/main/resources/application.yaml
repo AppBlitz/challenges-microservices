@@ -24,3 +24,9 @@ data_rabbit:
   event_one: ${EVENT_ONE}
   event_two: ${EVENT_TWO}
   event_three: ${EVENT_THREE}
+
+auth:
+  service:
+    email: ${AUTH_SERVICE_EMAIL}
+    password: ${AUTH_SERVICE_PASSWORD}
+    role: ${AUTH_SERVICE_ROLE}

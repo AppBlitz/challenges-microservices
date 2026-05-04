@@ -158,6 +158,9 @@ services:
       EVENT_ONE: ${EVENT_ONE}
       EVENT_TWO: ${EVENT_TWO}
       EVENT_THREE: ${EVENT_THREE}
+      AUTH_SERVICE_EMAIL: ${AUTH_SERVICE_EMAIL}
+      AUTH_SERVICE_PASSWORD: ${AUTH_SERVICE_PASSWORD}
+      AUTH_SERVICE_ROLE: ${AUTH_SERVICE_ROLE}
     depends_on:
       db-e:
         condition: service_healthy
