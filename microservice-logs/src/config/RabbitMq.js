@@ -48,7 +48,7 @@ async function connectionRabbitMq() {
                   date_enter: message_json.dateEnter
                 }
               ));
-              console.log("NOTIFICATION" + " Tipo:BIENVENIDA | " + "para: " + message_json.email_employee + " Mensaje: Bienvenido" + message_json.name_employee)
+              console.log("NOTIFICATION" + " Tipo:BIENVENIDA | " + "para: " + message_json.email + " Mensaje: Bienvenido" + message_json.nameUser)
               break;
             case event_two:
               const employee_delete = new DeleteEmployee(message_json.id_employee, message_json.name_employee, message_json.email_employee);

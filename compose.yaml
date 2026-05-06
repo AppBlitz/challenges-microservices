@@ -229,6 +229,6 @@ services:
 
 volumes:
   postgres-data:
+  mongo_data:
   mysql-data:
-  db-logs:
   postgres_data:
