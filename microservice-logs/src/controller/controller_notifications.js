@@ -3,7 +3,7 @@ import { search_log } from "../services/service_logs.js";
 
 const notificationController = {
 
-  get_notification_id_employee: (req, res) => {
+  get_notification_id_employee: (_, res) => {
     res.writeHead(200, { 'Content-type': 'application/json' });
     res.end(search_log());
   },

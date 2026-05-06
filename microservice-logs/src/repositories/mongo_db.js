@@ -3,10 +3,11 @@ const user_mongo = process.env.MONGO_INITDB_ROOT_USERNAME
 const user_password = process.env.MONGO_INITDB_ROOT_PASSWORD
 const name_database = process.env.MONGO_INITDB_DATABASE
 const host_database = process.env.MONGO_HOST
-console.log("this host of database of mongo", host_database);
-const uri = `mongodb://${user_mongo}:${user_password}@${host_database}/${name_database}?authSource=admin`
+const port_database = process.env.MONGO_PORT
+const uri = `mongodb://${user_mongo}:${user_password}@${host_database}:${port_database}/${name_database}?authSource=admin`
+console.log(uri);
 const { Schema, connect } = mongoose
-connect(uri)
+await connect(uri)
 const schema_logs = new Schema(
   {
     id_employee: Number,
@@ -29,7 +30,6 @@ async function save_employee_save_logs(Log) {
 
 async function search_all_logs() {
   const all_logs = await save_log_employee.find();;
-  console.log(all_logs)
   return all_logs
 }
 
