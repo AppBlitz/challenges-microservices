@@ -82,8 +82,8 @@ public class RabbitMqConsumerService : BackgroundService
         /// Declaración de la cola desde la cual se consumen los mensajes.
         /// </summary>
         await channel.QueueDeclareAsync(
-            queue: "hello",
-            durable: true,
+            queue: "employee",
+            durable:false,
             exclusive: false,
             autoDelete: false
         );
@@ -284,7 +284,7 @@ public class RabbitMqConsumerService : BackgroundService
         /// Inicio del consumo continuo de mensajes desde la cola.
         /// </summary>
         await channel.BasicConsumeAsync(
-            queue: "hello",
+            queue: "employee",
             autoAck: false,
             consumer: consumer
         );
