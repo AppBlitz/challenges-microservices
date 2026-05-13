@@ -43,12 +43,35 @@ public class RabbitMqConsumerService : BackgroundService
             /// <summary>
             /// Dirección del servidor RabbitMQ.
             /// </summary>
-            HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost",
+            HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "rabbitmq",
             UserName = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME") ?? "guest",
             Password = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD") ?? "guest"
         };
 
-        var connection = await factory.CreateConnectionAsync();
+        /// <summary>
+        /// Establece la conexión con RabbitMQ, implementando un mecanismo de reintentos
+        /// </summary>
+        IConnection? connection= null;
+
+        
+        /// <summary>
+        /// reinttenta kka conexión a RabbitMQ cada 5 segundos en caso de fallo,
+        /// hasta que se establezca correctamente.
+        /// </summary>
+        while (connection == null)
+        {
+            try
+            {
+                connection = await factory.CreateConnectionAsync();
+                Console.WriteLine("Conexión a RabbitMQ establecida exitosamente.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al conectar a RabbitMQ: {ex.Message}");
+                Console.WriteLine("Reintentando en 5 segundos...");
+                await Task.Delay(5000, stoppingToken);
+            }
+        }
 
         /// <summary>
         /// Canal de comunicación con RabbitMQ.

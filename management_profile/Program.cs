@@ -34,6 +34,17 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddScoped<IProfileService, ProfileService>();
 
 /// <summary>
+/// Configura el comportamiento de los servicios en segundo plano
+/// para que no detengan la aplicación en caso de excepciones no controladas.
+/// mas específicamente, el servicio de consumo de RabbitMQ
+/// </summary>
+builder.Services.Configure<HostOptions>(options =>
+{
+    options.BackgroundServiceExceptionBehavior =
+        BackgroundServiceExceptionBehavior.Ignore;
+});
+
+/// <summary>
 /// Registra el servicio en segundo plano encargado de consumir mensajes
 /// desde RabbitMQ.
 /// Permite sincronizar automáticamente la creación y eliminación de perfiles
