@@ -19,9 +19,9 @@ using System.Text.Json.Serialization;
 /// Permite validar o registrar la eliminación del perfil relacionado.
 /// </param>
 public record MessageRabbitDeleteEmployee(
-    [property: JsonPropertyName("id")] long Id,
+    [property: JsonPropertyName("id_employee")] long Id,
 
-    [property: JsonPropertyName("nameUser")] string NameUser,
+    [property: JsonPropertyName("name_one")] string NameUser,
 
     [property: JsonPropertyName("email")] string Email
 );
