@@ -1,0 +1,76 @@
+pipeline {
+  agent {
+    docker {
+      image 'golang:1.22-alpine'
+      args '-v /root/go/pkg:/root/go/pkg'
+    }
+  }
+
+  environment {
+    SONAR_TOKEN = credentials('sonar-token')
+  }
+
+  stages {
+    stage('Checkout') {
+      steps { echo '📥 Código obtenido' }
+    }
+
+    stage('Build') {
+      steps {
+        dir('department_backend') {
+          sh 'go build ./...'
+        }
+      }
+    }
+
+    stage('Test') {
+      steps {
+        dir('microservicio-go') {
+          sh 'go test -coverprofile=coverage.out ./...'
+          sh 'go tool cover -func=coverage.out'
+        }
+      }
+    }
+
+    stage('SonarQube') {
+      steps {
+        dir('microservicio-go') {
+          // sonar-scanner se descarga en tiempo de ejecución
+          sh """
+            wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+            unzip -q sonar-scanner-cli-*.zip
+            ./sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \
+              -Dsonar.projectKey=go-service \
+              -Dsonar.sources=. \
+              -Dsonar.go.coverage.reportPaths=coverage.out \
+              -Dsonar.host.url=http://sonarqube:9000 \
+              -Dsonar.token=${SONAR_TOKEN}
+          """
+        }
+      }
+    }
+
+    stage('Quality Gate') {
+      steps {
+        timeout(time: 5, unit: 'MINUTES') {
+          waitForQualityGate abortPipeline: true
+        }
+      }
+    }
+
+    stage('Package') {
+      steps {
+        script {
+          def tag = "${env.BUILD_NUMBER}"
+          sh "docker build -t localhost:5000/go-service:${tag} -t localhost:5000/go-service:latest ./microservicio-go"
+          sh "docker push localhost:5000/go-service:${tag}"
+        }
+      }
+    }
+  }
+
+  post {
+    success { echo '✅ Pipeline Go completado' }
+    failure { echo '❌ Pipeline Go falló' }
+  }
+}
