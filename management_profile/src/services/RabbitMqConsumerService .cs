@@ -136,12 +136,9 @@ public class RabbitMqConsumerService : BackgroundService
                 {
                     var employeeMessage = jsonDocument;
                     Console.WriteLine($"Contenido del mensaje: {employeeMessage.RootElement}");
-                    Console.WriteLine($"Nombre del empleado en el mensaje: {employeeMessage.RootElement.GetProperty("nameUser").GetString()}");
-                    Console.WriteLine($"Id del empleado en el mensaje: {employeeMessage.RootElement.GetProperty("id").ToString()}");
 
                     if (employeeMessage != null)
                     {
-                        Console.WriteLine("Procesando creación de perfil para el empleado...");
                         /// <summary>
                         /// Verifica si el perfil ya existe antes de crearlo.
                         /// </summary>

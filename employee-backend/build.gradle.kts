@@ -1,7 +1,10 @@
 plugins {
+
 	java
 	id("org.springframework.boot") version "4.0.2"
 	id("io.spring.dependency-management") version "1.1.7"
+	id("jacoco")
+	id ("org.sonarqube" version "4.4.1.3373")
 }
 
 group = "com.employee"
@@ -47,4 +50,20 @@ dependencies {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+jacoco {
+    toolVersion = "0.8.11"
 }
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+sonar {
+    properties {
+        property 'sonar.projectKey', 'employee-backend'
+        property 'sonar.projectName', 'Employee Backend'
+    }
+}}
