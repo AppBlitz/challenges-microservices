@@ -1,11 +1,13 @@
 package com.authService.auth_service.services;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.authService.auth_service.model.User;
 import com.authService.auth_service.repository.UserRepository;
 import com.authService.auth_service.utils.JwtUtil;
+
 import io.jsonwebtoken.Claims;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
@@ -45,7 +47,10 @@ public class AuthService {
 
         // Generar token de recuperación (JWT corto)
         String resetToken = jwtUtil.generateResetToken(user.getEmail());
-
+        
+        // En un sistema real, aquí se enviaría un email al usuario con el token de recuperación
+        // y un enlace para restablecer su contraseña. El token se incluiría en el enlace, por ejemplo:
+        // https://frontend-app.com/reset-password?token=resetToken
         // Aquí se publicaría un evento usuario.recuperacion (RabbitMQ/Kafka)
         // con el email y el token
 
