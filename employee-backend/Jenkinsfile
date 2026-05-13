@@ -1,0 +1,79 @@
+pipeline {
+  agent {
+    docker {
+      image 'gradle:9.4.1-jdk21'
+      args '-v /root/.gradle:/root/.gradle'  // cache de dependencias
+    }
+  }
+
+  environment {
+    SONAR_TOKEN = credentials('sonar-token')
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        echo '📥 Código obtenido'
+      }
+    }
+
+    stage('Build') {
+      steps {
+        dir('employee-backend') {
+          sh 'chmod +x ./gradlew'
+          sh './gradlew clean classes -x test'
+        }
+      }
+    }
+
+    stage('Test') {
+      steps {
+        dir('employee-backend') {
+          sh './gradlew test jacocoTestReport'
+        }
+      }
+      post {
+        always {
+          junit 'employee-backend/build/test-results/test/*.xml'
+        }
+      }
+    }
+
+    stage('SonarQube') {
+      steps {
+        dir('employee-backend') {
+          sh """
+            ./gradlew sonar \
+              -Dsonar.host.url=http://sonarqube:9000 \
+              -Dsonar.token=${SONAR_TOKEN} \
+              -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
+          """
+        }
+      }
+    }
+
+    stage('Quality Gate') {
+      steps {
+        timeout(time: 5, unit: 'MINUTES') {
+          waitForQualityGate abortPipeline: true
+        }
+      }
+    }
+
+    stage('Package') {
+      steps {
+        script {
+          def tag = "${env.BUILD_NUMBER}"
+          sh "docker build -t localhost:5000/employee-backend:${tag} -t localhost:5000/employee-backend:latest ./employee-backend"
+          sh "docker push localhost:5000/employee-backend:${tag}"
+          sh "docker push localhost:5000/employee-backend:latest"
+        }
+      }
+    }
+  }
+
+  post {
+    success { echo '✅ Pipeline employee-backend completado' }
+    failure { echo '❌ Pipeline employee-backend falló' }
+  }
+}

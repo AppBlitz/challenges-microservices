@@ -23,13 +23,13 @@ using System.Text.Json.Serialization;
 /// Fecha de ingreso del empleado a la organización.
 /// </param>
 public record MessageRabbitMq(
-    [property: JsonPropertyName("id")] long Id,
+    [property: JsonPropertyName("id_employee")] long Id,
 
-    [property: JsonPropertyName("nameUser")] string NameUser,
+    [property: JsonPropertyName("name_one")] string NameUser,
 
     [property: JsonPropertyName("email")] string Email,
 
-    [property: JsonPropertyName("departmentID")] long DepartmentID,
+    [property: JsonPropertyName("department_id")] long DepartmentID,
 
     [property: JsonPropertyName("dateEnter")] DateTime DateEnter
 );

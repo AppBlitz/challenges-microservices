@@ -1,0 +1,62 @@
+jenkins:
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "admin123"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+unclassified:
+  sonarGlobalConfiguration:
+    buildWrapperEnabled: true
+    installations:
+      - name: "SonarQube"
+        serverUrl: "http://sonarqube:9000"
+        credentialsId: "sonar-token"
+
+jobs:
+  - script: |
+      pipelineJob('java-service') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote { url('https://github.com/AppBlitz/challenges-microservices.git') }
+                branches('*/main')
+              }
+            }
+            scriptPath('microservicio-java/Jenkinsfile')
+          }
+        }
+      }
+  - script: |
+      pipelineJob('node-service') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote { url('https://github.com/AppBlitz/challenges-microservices.git') }
+                branches('*/main')
+              }
+            }
+            scriptPath('microservicio-node/Jenkinsfile')
+          }
+        }
+      }
+  - script: |
+      pipelineJob('go-service') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote { url('https://github.com/AppBlitz/challenges-microservices.git') }
+                branches('*/main')
+              }
+            }
+            scriptPath('microservicio-go/Jenkinsfile')
+          }
+        }
+      }

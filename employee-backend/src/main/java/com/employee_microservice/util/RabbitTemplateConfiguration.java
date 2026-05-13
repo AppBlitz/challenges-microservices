@@ -35,7 +35,7 @@ public class RabbitTemplateConfiguration {
      * @return A configured {@link DirectExchange} instance.
      */
     @Bean
-    public DirectExchange direct() {
+    DirectExchange direct() {
         return new DirectExchange(direct_exchange.toString());
     }
 
@@ -45,7 +45,7 @@ public class RabbitTemplateConfiguration {
      * @return A non-durable {@link Queue} instance.
      */
     @Bean
-    public Queue createQueue() {
+    Queue createQueue() {
         return new Queue(name_queue.toString(), false);
     }
 

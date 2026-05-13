@@ -2,10 +2,11 @@ import mongoose from "mongoose"
 const user_mongo = process.env.MONGO_INITDB_ROOT_USERNAME
 const user_password = process.env.MONGO_INITDB_ROOT_PASSWORD
 const name_database = process.env.MONGO_INITDB_DATABASE
-const host_database = process.env.RABBITMQ_HOST
-const uri = `mongodb://${user_mongo}:${user_password}@${host_database}/${name_database}?authSource=admin`
+const host_database = process.env.MONGO_HOST
+const port_database = process.env.MONGO_PORT
+const uri = `mongodb://${user_mongo}:${user_password}@${host_database}:${port_database}/${name_database}?authSource=admin`
 const { Schema, connect } = mongoose
-connect(uri)
+await connect(uri)
 const schema_logs = new Schema(
   {
     id_employee: Number,
@@ -17,18 +18,26 @@ const schema_logs = new Schema(
 )
 const save_log_employee = mongoose.model("logs", schema_logs)
 async function save_employee_save_logs(Log) {
-  const save_employee = new save_log_employee()
-  save_employee.id_employee = Log.id_employee
-  save_employee.name_user = Log.name_employee
-  save_employee.user_email = Log.email_employe
-  save_employee.department_id = Log.department_id
-  save_employee.date_enter_user = Log.date_enter
-  await save_employee.save()
+  try {
+    console.log("data to save", Log);
+
+    const save_employee = new save_log_employee({
+      id_employee: Log.ID_employee,
+      name_user: Log.name_employee,
+      user_email: Log.email_employe,
+      department_id: Log.department_id,
+      date_enter_user: Log.date_enter
+    });
+
+    await save_employee.save();
+
+  } catch (error) {
+    console.error("❌ Error al guardar:", error.message);
+  }
 }
 
 async function search_all_logs() {
   const all_logs = await save_log_employee.find();;
-  console.log(all_logs)
   return all_logs
 }
 
