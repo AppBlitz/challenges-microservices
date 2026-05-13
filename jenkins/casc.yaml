@@ -24,7 +24,7 @@ jobs:
           cpsScm {
             scm {
               git {
-                remote { url('https://github.com/TU_USUARIO/TU_REPO.git') }
+                remote { url('https://github.com/AppBlitz/challenges-microservices.git') }
                 branches('*/main')
               }
             }
@@ -38,7 +38,7 @@ jobs:
           cpsScm {
             scm {
               git {
-                remote { url('https://github.com/TU_USUARIO/TU_REPO.git') }
+                remote { url('https://github.com/AppBlitz/challenges-microservices.git') }
                 branches('*/main')
               }
             }
@@ -52,7 +52,7 @@ jobs:
           cpsScm {
             scm {
               git {
-                remote { url('https://github.com/TU_USUARIO/TU_REPO.git') }
+                remote { url('https://github.com/AppBlitz/challenges-microservices.git') }
                 branches('*/main')
               }
             }
