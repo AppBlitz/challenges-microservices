@@ -25,10 +25,10 @@ jobs:
             scm {
               git {
                 remote { url('https://github.com/AppBlitz/challenges-microservices.git') }
-                branches('*/main')
+                branches('*/jahn')
               }
             }
-            scriptPath('microservicio-java/Jenkinsfile')
+            scriptPath('employee_backend/Jenkinsfile')
           }
         }
       }
@@ -39,10 +39,10 @@ jobs:
             scm {
               git {
                 remote { url('https://github.com/AppBlitz/challenges-microservices.git') }
-                branches('*/main')
+                branches('*/jahn')
               }
             }
-            scriptPath('microservicio-node/Jenkinsfile')
+            scriptPath('microservicio-logs/Jenkinsfile')
           }
         }
       }
