@@ -23,7 +23,7 @@ pipeline {
 
         // sh '/root/go/bin/swag init'
 
-         sh '$(go env GOPATH)/bin/swag init'
+        sh '$(go env GOPATH)/bin/swag init'
 
         sh 'go build ./...'
         }
