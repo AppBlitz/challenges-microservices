@@ -15,20 +15,23 @@ pipeline {
       steps { echo '📥 Código obtenido' }
     }
 
-    stage('Build') {
-      steps {
-        dir('department_backend/cmd/app') {
+stage('Build') {
+  steps {
 
-        sh 'go install github.com/swaggo/swag/cmd/swag@latest'
+    dir('department_backend') {
 
-        // sh '/root/go/bin/swag init'
+      sh '''
+        export PATH=$PATH:$(go env GOPATH)/bin
 
-        sh '$(go env GOPATH)/bin/swag init'
+        go install github.com/swaggo/swag/cmd/swag@latest
 
-        sh 'go build ./...'
-        }
-      }
+        swag init -g cmd/app/main.go
+
+        go build ./...
+      '''
     }
+  }
+}
 
     stage('Test') {
       steps {
