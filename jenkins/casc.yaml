@@ -28,7 +28,7 @@ jobs:
                 branches('*/jahn')
               }
             }
-            scriptPath('employee_backend/Jenkinsfile')
+            scriptPath('employee-backend/Jenkinsfile')
           }
         }
       }
