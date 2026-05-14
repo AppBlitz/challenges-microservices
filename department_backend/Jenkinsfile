@@ -17,7 +17,7 @@ pipeline {
 
     stage('Build') {
       steps {
-        dir('department_backend/cmd') {
+        dir('department_backend/cmd/app') {
 
         sh 'go install github.com/swaggo/swag/cmd/swag@latest'
 
