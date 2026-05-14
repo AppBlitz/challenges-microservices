@@ -6,6 +6,9 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     groupadd -f docker && usermod -aG docker jenkins
 
+
+RUN usermod -aG docker jenkins
+
 USER jenkins
 
 RUN jenkins-plugin-cli --plugins \

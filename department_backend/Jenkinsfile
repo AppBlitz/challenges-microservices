@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-      image 'golang:1.22-alpine'
+      image 'golang:1.26-alpine'
       args '-v /root/go/pkg:/root/go/pkg'
     }
   }
@@ -17,7 +17,7 @@ pipeline {
 
     stage('Build') {
       steps {
-        dir('department_backend') {
+        dir('department_backend/cmd') {
           sh 'go build ./...'
         }
       }
@@ -25,7 +25,7 @@ pipeline {
 
     stage('Test') {
       steps {
-        dir('microservicio-go') {
+        dir('department_backend/test') {
           sh 'go test -coverprofile=coverage.out ./...'
           sh 'go tool cover -func=coverage.out'
         }
@@ -34,7 +34,7 @@ pipeline {
 
     stage('SonarQube') {
       steps {
-        dir('microservicio-go') {
+        dir('department_backend') {
           // sonar-scanner se descarga en tiempo de ejecución
           sh """
             wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
@@ -62,8 +62,8 @@ pipeline {
       steps {
         script {
           def tag = "${env.BUILD_NUMBER}"
-          sh "docker build -t localhost:5000/go-service:${tag} -t localhost:5000/go-service:latest ./microservicio-go"
-          sh "docker push localhost:5000/go-service:${tag}"
+          sh "docker build -t localhost:5000/:${tag} -t localhost:5000/:latest ./department_backend"
+          sh "docker push localhost:5000/:${tag}"
         }
       }
     }
