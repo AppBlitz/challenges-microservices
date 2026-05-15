@@ -1,20 +1,19 @@
 {
   "name": "microservice-logs",
   "version": "1.0.0",
-  "type": "module",
   "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "type": "module",
   "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
   "scripts": {
-    
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "start": "node index.js"
-    
-    
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.33.0",
   "dependencies": {
     "amqplib": "^1.0.3",
     "cassandra-driver": "^4.8.0",
@@ -26,5 +25,6 @@
   "devDependencies": {
     "jest": "^30.4.2",
     "jsdoc": "^4.0.5"
-  }
+  },
+  "packageManager": "pnpm@10.33.0"
 }

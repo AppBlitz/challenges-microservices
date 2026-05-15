@@ -1,83 +1,45 @@
-// service_logs.test.js
+import mongoose from "mongoose"
+const user_mongo = process.env.MONGO_INITDB_ROOT_USERNAME
+const user_password = process.env.MONGO_INITDB_ROOT_PASSWORD
+const name_database = process.env.MONGO_INITDB_DATABASE
+const host_database = process.env.MONGO_HOST
+const port_database = process.env.MONGO_PORT
+const uri = `mongodb://${user_mongo}:${user_password}@${host_database}:${port_database}/${name_database}?authSource=admin`
+const { Schema, connect } = mongoose
+await connect(uri)
+const schema_logs = new Schema(
+  {
+    id_employee: Number,
+    name_user: String,
+    user_email: String,
+    department_id: Number,
+    date_enter_user: Date
+  }
+)
+const save_log_employee = mongoose.model("logs", schema_logs)
+async function save_employee_save_logs(Log) {
+  try {
+    console.log("data to save", Log);
 
-// ✅ DEBE ir antes de cualquier import que use mongoose
-jest.mock("mongoose", () => {
-  const mockModel = {
-    create: jest.fn(),
-    find: jest.fn().mockReturnValue({ exec: jest.fn() }),
-    findOne: jest.fn(),
-    save: jest.fn(),
-  };
-
-  const mockSchema = jest.fn().mockImplementation(() => ({}));
-
-  return {
-    connect: jest.fn().mockResolvedValue(true),   // 👈 evita el crash del URI
-    Schema: mockSchema,
-    model: jest.fn().mockReturnValue(mockModel),
-  };
-});
-
-// Mockear las funciones del repositorio
-jest.mock("../src/repositories/mongo_db.js", () => ({
-  save_employee_save_logs: jest.fn(),
-  search_all_logs: jest.fn(),
-}));
-
-import { insert_log_save_employee, search_log } from "../src/services/service_logs.js";
-import * as mongoRepo from "../src/repositories/mongo_db.js";
-
-describe("Log Service", () => {
-  beforeAll(() => {
-    jest.spyOn(console, "log").mockImplementation(() => {});
-    jest.spyOn(console, "error").mockImplementation(() => {});
-  });
-
-  afterAll(() => {
-    console.log.mockRestore();
-    console.error.mockRestore();
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  describe("insert_log_save_employee", () => {
-    test("debe llamar a save_employee_save_logs con el objeto correcto", () => {
-      const logData = {
-        ID_employee: 1,
-        name_employee: "John Doe",
-        email_employee: "john.doe@mail.com",
-        department_id: 10,
-        date_enter: new Date(),
-      };
-
-      insert_log_save_employee(logData);
-
-      expect(mongoRepo.save_employee_save_logs).toHaveBeenCalledTimes(1);
-      expect(mongoRepo.save_employee_save_logs).toHaveBeenCalledWith(logData);
-    });
-  });
-
-  describe("search_log", () => {
-    test("debe retornar lo que devuelve search_all_logs", () => {
-      const fakeLogs = [
-        { ID_employee: 1, name_employee: "John Doe" },
-        { ID_employee: 2, name_employee: "Jane Smith" },
-      ];
-
-      mongoRepo.search_all_logs.mockReturnValue(fakeLogs);
-
-      const result = search_log();
-
-      expect(mongoRepo.search_all_logs).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(fakeLogs);
+    const save_employee = new save_log_employee({
+      id_employee: Log.ID_employee,
+      name_user: Log.name_employee,
+      user_email: Log.email_employe,
+      department_id: Log.department_id,
+      date_enter_user: Log.date_enter
     });
 
-    test("debe retornar array vacío si no hay logs", () => {
-      mongoRepo.search_all_logs.mockReturnValue([]);
-      const result = search_log();
-      expect(result).toEqual([]);
-    });
-  });
-});
+    await save_employee.save();
+
+  } catch (error) {
+    console.error("❌ Error al guardar:", error.message);
+  }
+}
+
+async function search_all_logs() {
+  const all_logs = await save_log_employee.find();;
+  return all_logs
+}
+
+
+export { save_employee_save_logs, search_all_logs }
