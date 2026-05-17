@@ -1,5 +1,5 @@
 import { connect, credentials } from "amqplib"
-import { insert_log_save_employee } from "../services/service_logs.js"
+import { insert_log_save_employee, insert_log_delete_employee } from "../services/service_logs.js"
 import DeleteEmployee from "../model/model_event_employee_delete.js"
 
 const user_rabbit = process.env.RABBITMQ_USER
@@ -39,20 +39,28 @@ async function connectionRabbitMq() {
           const message_json = JSON.parse(message.content.toString());
           switch (routingKey) {
             case event_one:
-              insert_log_save_employee(JSON.stringify(
-                {
-                  ID_employee: message_json.id,
-                  name_employee: message_json.nameUser,
-                  email_employee: message_json.email,
-                  department_id: message_json.departmentID,
-                  date_enter: message_json.dateEnter
-                }
-              ));
-              console.log("NOTIFICATION" + " Tipo:BIENVENIDA | " + "para: " + message_json.email + " Mensaje: Bienvenido" + message_json.nameUser)
+              insert_log_save_employee(JSON.stringify({
+                ID_employee: message_json.id,
+                name_employee: message_json.nameUser,
+                email_employee: message_json.email,
+                department_id: message_json.departmentID,
+                date_enter: message_json.dateEnter
+              }));
+              console.log("NOTIFICATION Tipo:BIENVENIDA | para: " + message_json.email)
               break;
             case event_two:
-              const employee_delete = new DeleteEmployee(message_json.id_employee, message_json.name_employee, message_json.email_employee);
-              console.log("[NOTIFICATION]" + " tipo: DESVINCULACIÓN" + " para: " + employee_delete.getEmail() + " | " + "Mensaje: Su cuenta ha sido aliminada " + employee_delete.getName())
+              const employee_delete = new DeleteEmployee(
+                  message_json.id_employee,
+                  message_json.name_employee,
+                  message_json.email_employee
+              );
+              // CORRECCIÓN — ahora guarda en MongoDB
+              insert_log_delete_employee({
+                id_employee: employee_delete.getId(),
+                name_employee: employee_delete.getName(),
+                email_employee: employee_delete.getEmail()
+              });
+              console.log("[NOTIFICATION] tipo: DESVINCULACIÓN para: " + employee_delete.getEmail())
               break;
             default:
               break;
@@ -64,11 +72,7 @@ async function connectionRabbitMq() {
 
     } catch (error) {
       attempts--;
-
-      if (attempts === 0) {
-        return;
-      }
-
+      if (attempts === 0) return;
       await sleep(5000);
     }
   }
@@ -77,5 +81,5 @@ async function connectionRabbitMq() {
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-export { connectionRabbitMq }
 
+export { connectionRabbitMq }
