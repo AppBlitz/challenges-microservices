@@ -80,12 +80,20 @@ stage('SonarQube') {
             withSonarQubeEnv('SonarQube') {
 
                 sh '''
+
+                    apk add --no-cache openjdk17-jre wget unzip
+
+                    wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006.zip
+
+                    unzip -q sonar-scanner-cli-5.0.1.3006.zip
+
+                    export PATH=$PATH:$(pwd)/sonar-scanner-5.0.1.3006/bin
+
                     sonar-scanner \
                       -Dsonar.projectKey=go-service \
                       -Dsonar.sources=. \
-                      -Dsonar.go.coverage.reportPaths=coverage.out \
-                      -Dsonar.host.url=$SONAR_HOST_URL \
-                      -Dsonar.token=$SONAR_AUTH_TOKEN
+                      -Dsonar.go.coverage.reportPaths=coverage.out
+
                 '''
             }
         }
