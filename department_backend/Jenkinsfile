@@ -85,7 +85,7 @@ stage('SonarQube') {
 
                     wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006.zip
 
-                    unzip -q sonar-scanner-cli-5.0.1.3006.zip
+                    unzip -oq sonar-scanner-cli-5.0.1.3006.zip
 
                     export PATH=$PATH:$(pwd)/sonar-scanner-5.0.1.3006/bin
 
