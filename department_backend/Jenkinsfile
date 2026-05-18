@@ -112,9 +112,24 @@ stage('SonarQube') {
     stage('Package') {
       steps {
         script {
-          def tag = "${env.BUILD_NUMBER}"
-          sh "docker build -t localhost:5000/go-service:${tag}  -t localhost:5000/go-service:latest  ./department_backend"
-          sh "docker push localhost:5000/go-service:${tag}"
+          // def tag = "${env.BUILD_NUMBER}"
+          // sh "docker build -t localhost:5000/go-service:${tag}  -t localhost:5000/go-service:latest  ./department_backend"
+          // sh "docker push localhost:5000/go-service:${tag}"
+                def tag = "${env.BUILD_NUMBER}"
+
+              sh """
+                apk add --no-cache docker-cli
+
+                docker build \
+                  -t localhost:5000/go-service:${tag} \
+                  -t localhost:5000/go-service:latest \
+                  ./department_backend
+
+                docker push localhost:5000/go-service:${tag}
+
+                docker push localhost:5000/go-service:latest
+              """
+    
         }
       }
     }
