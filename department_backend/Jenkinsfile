@@ -85,7 +85,7 @@ stage('Quality Gate') {
       steps {
         script {
           def tag = "${env.BUILD_NUMBER}"
-          sh "docker build -t localhost:5000/:${tag} \ -t localhost:5000/:latest \ ./department_backend"
+          sh "docker build -t localhost:5000/:${tag}  -t localhost:5000/:latest  ./department_backend"
           sh "docker push localhost:5000/:${tag}"
         }
       }
