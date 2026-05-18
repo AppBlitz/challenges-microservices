@@ -113,8 +113,8 @@ stage('SonarQube') {
       steps {
         script {
           def tag = "${env.BUILD_NUMBER}"
-          sh "docker build -t localhost:5000/:${tag}  -t localhost:5000/:latest  ./department_backend"
-          sh "docker push localhost:5000/:${tag}"
+          sh "docker build -t localhost:5000/go-service:${tag}  -t localhost:5000/go-service:latest  ./department_backend"
+          sh "docker push localhost:5000/go-service:${tag}"
         }
       }
     }
