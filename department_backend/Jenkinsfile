@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'golang:1.26-alpine'
-      args '-v /root/go/pkg:/root/go/pkg --network microservices_microservices-network'
+      args '-v /root/go/pkg:/root/go/pkg --network challenges-microservices_microservices-network '
     }
   }
 
