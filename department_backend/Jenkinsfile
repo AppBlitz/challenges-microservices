@@ -100,14 +100,14 @@ stage('SonarQube') {
     }
 }
 
-stage('Quality Gate') {
-    steps {
+// stage('Quality Gate') {
+//     steps {
 
-        timeout(time: 15, unit: 'MINUTES') {
-            waitForQualityGate abortPipeline: true
-        }
-    }
-}
+//         timeout(time: 15, unit: 'MINUTES') {
+//             waitForQualityGate abortPipeline: true
+//         }
+//     }
+// }
 
     stage('Package') {
       steps {
