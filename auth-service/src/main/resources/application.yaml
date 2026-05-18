@@ -13,7 +13,7 @@ spring:
         format_sql: true
   rabbitmq:
     host: ${RABBITMQ_HOST}
-    port: ${RABBITMQ_PORT}
+    port: ${PORTS_CLIENT_RABBIT_EXPOSE}
     username: ${RABBITMQ_USERNAME}
     password: ${RABBITMQ_PASSWORD}
 

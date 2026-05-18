@@ -16,57 +16,67 @@ pipeline {
     }
 
 stage('Build') {
-  steps {
+    steps {
 
-    dir('department_backend') {
+        dir('department_backend') {
 
-      sh '''
-        export PATH=$PATH:$(go env GOPATH)/bin
+            sh '''
+                export PATH=$PATH:$(go env GOPATH)/bin
 
-        go install github.com/swaggo/swag/cmd/swag@latest
+                go install github.com/swaggo/swag/cmd/swag@latest
 
-        swag init -g cmd/app/main.go
+                swag init -g cmd/app/main.go
 
-        go build ./...
-      '''
+                go build ./...
+            '''
+        }
     }
-  }
 }
 
-    stage('Test') {
-      steps {
-        dir('department_backend/test') {
-          sh 'go test -coverprofile=coverage.out ./...'
-          sh 'go tool cover -func=coverage.out'
-        }
-      }
-    }
+stage('Test') {
+    steps {
 
-    stage('SonarQube') {
-      steps {
         dir('department_backend') {
-          // sonar-scanner se descarga en tiempo de ejecución
-          sh """
-            wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
-            unzip -q sonar-scanner-cli-*.zip
-            ./sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \
-              -Dsonar.projectKey=go-service \
-              -Dsonar.sources=. \
-              -Dsonar.go.coverage.reportPaths=coverage.out \
-              -Dsonar.host.url=http://sonarqube:9000 \
-              -Dsonar.token=${SONAR_TOKEN}
-          """
-        }
-      }
-    }
 
-    stage('Quality Gate') {
-      steps {
-        timeout(time: 5, unit: 'MINUTES') {
-          waitForQualityGate abortPipeline: true
+            sh '''
+                go test ./... -coverprofile=coverage.out
+                go tool cover -func=coverage.out
+            '''
         }
-      }
     }
+}
+
+stage('SonarQube') {
+    steps {
+
+        dir('department_backend') {
+
+            sh '''
+                apk add --no-cache unzip wget
+
+                wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+
+                unzip -o sonar-scanner-cli-5.0.1.3006-linux.zip
+
+                ./sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \
+                  -Dsonar.projectKey=go-service \
+                  -Dsonar.sources=. \
+                  -Dsonar.go.coverage.reportPaths=coverage.out \
+                  -Dsonar.host.url=http://sonarqube:9000 \
+                  -Dsonar.token=$SONAR_TOKEN
+            '''
+        }
+    }
+}
+
+stage('Quality Gate') {
+    steps {
+
+        timeout(time: 5, unit: 'MINUTES') {
+            waitForQualityGate abortPipeline: true
+        }
+    }
+}
 
     stage('Package') {
       steps {

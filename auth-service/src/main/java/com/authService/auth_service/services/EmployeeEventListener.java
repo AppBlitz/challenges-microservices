@@ -19,7 +19,7 @@ public class EmployeeEventListener {
         this.jwtUtil = jwtUtil;
     }
 
-    @RabbitListener(queuesToDeclare = @Queue(name = "employee.save", durable = "true"))
+    @RabbitListener(queuesToDeclare = @Queue(name = "employee.save", durable = "false"))
     public void handleEmployeeCreated(String email) {
         // Crear usuario con rol USER y sin contraseña válida
         User user = User.builder()
@@ -38,7 +38,7 @@ public class EmployeeEventListener {
         System.out.println("[EVENTO] usuario.creado -> " + email + " token=" + resetToken);
     }
 
-    @RabbitListener(queuesToDeclare = @Queue(name = "employee.delete", durable = "true"))
+    @RabbitListener(queuesToDeclare = @Queue(name = "employee.delete", durable = "false"))
     public void handleEmployeeDeleted(String email) {
         userRepository.findByEmail(email).ifPresent(user -> {
             user.setEnabled(false);
