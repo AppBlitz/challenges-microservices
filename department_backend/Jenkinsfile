@@ -46,28 +46,48 @@ stage('Test') {
     }
 }
 
+// stage('SonarQube') {
+//     steps {
+
+//         dir('department_backend') {
+
+//             sh '''
+//                 apk add --no-cache unzip wget openjdk17-jre
+
+//                 export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+//                 export PATH=$JAVA_HOME/bin:$PATH
+
+//                 wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006.zip
+
+//                 unzip -o sonar-scanner-cli-5.0.1.3006.zip
+
+//                 ./sonar-scanner-5.0.1.3006/bin/sonar-scanner \
+//                   -Dsonar.projectKey=go-service \
+//                   -Dsonar.sources=. \
+//                   -Dsonar.go.coverage.reportPaths=coverage.out \
+//                   -Dsonar.host.url=http://sonarqube:9000 \
+//                   -Dsonar.token=$SONAR_TOKEN
+//             '''
+//         }
+//     }
+// }
+
 stage('SonarQube') {
     steps {
 
         dir('department_backend') {
 
-            sh '''
-                apk add --no-cache unzip wget openjdk17-jre
+            withSonarQubeEnv('SonarQube') {
 
-                export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
-                export PATH=$JAVA_HOME/bin:$PATH
-
-                wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006.zip
-
-                unzip -o sonar-scanner-cli-5.0.1.3006.zip
-
-                ./sonar-scanner-5.0.1.3006/bin/sonar-scanner \
-                  -Dsonar.projectKey=go-service \
-                  -Dsonar.sources=. \
-                  -Dsonar.go.coverage.reportPaths=coverage.out \
-                  -Dsonar.host.url=http://sonarqube:9000 \
-                  -Dsonar.token=$SONAR_TOKEN
-            '''
+                sh '''
+                    sonar-scanner \
+                      -Dsonar.projectKey=go-service \
+                      -Dsonar.sources=. \
+                      -Dsonar.go.coverage.reportPaths=coverage.out \
+                      -Dsonar.host.url=$SONAR_HOST_URL \
+                      -Dsonar.token=$SONAR_AUTH_TOKEN
+                '''
+            }
         }
     }
 }
