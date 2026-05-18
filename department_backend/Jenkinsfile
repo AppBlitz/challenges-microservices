@@ -52,13 +52,16 @@ stage('SonarQube') {
         dir('department_backend') {
 
             sh '''
-                apk add --no-cache unzip wget
+                apk add --no-cache unzip wget openjdk17-jre
 
-                wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+                export JAVA_HOME=/usr/lib/jvm/java-17-openjdk
+                export PATH=$JAVA_HOME/bin:$PATH
 
-                unzip -o sonar-scanner-cli-5.0.1.3006-linux.zip
+                wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006.zip
 
-                ./sonar-scanner-5.0.1.3006-linux/bin/sonar-scanner \
+                unzip -o sonar-scanner-cli-5.0.1.3006.zip
+
+                ./sonar-scanner-5.0.1.3006/bin/sonar-scanner \
                   -Dsonar.projectKey=go-service \
                   -Dsonar.sources=. \
                   -Dsonar.go.coverage.reportPaths=coverage.out \
