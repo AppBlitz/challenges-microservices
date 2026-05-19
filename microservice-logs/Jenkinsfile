@@ -34,13 +34,18 @@ pipeline {
 
 stage('SonarQube') {
   steps {
-
     dir('microservice-logs') {
 
       withSonarQubeEnv('SonarQube') {
 
         sh '''
-          npm install -g sonar-scanner
+          apk add --no-cache openjdk17-jre wget unzip
+
+          wget -q https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006.zip
+
+          unzip -oq sonar-scanner-cli-5.0.1.3006.zip
+
+          export PATH=$PATH:$(pwd)/sonar-scanner-5.0.1.3006/bin
 
           sonar-scanner \
             -Dsonar.projectKey=logs-service \
