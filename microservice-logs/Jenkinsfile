@@ -35,13 +35,12 @@ pipeline {
     stage('SonarQube') {
       steps {
         dir('microservice-logs') {
+          withSonarQubeEnv('SonarQube') {
           sh """
             npx sonar-scanner \
               -Dsonar.projectKey=logs-service \
               -Dsonar.sources=src \
-              -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-              -Dsonar.host.url=http://sonarqube:9000 \
-              -Dsonar.token=${SONAR_TOKEN}
+              -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info 
           """
         }
       }
