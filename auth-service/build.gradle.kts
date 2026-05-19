@@ -37,6 +37,14 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
+
+
+	// Observabilidad
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("io.micrometer:micrometer-registry-prometheus")
+	implementation("net.logstash.logback:logstash-logback-encoder:7.4")
+
+
 }
 
 tasks.withType<Test> {

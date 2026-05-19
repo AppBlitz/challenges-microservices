@@ -48,7 +48,20 @@ public class RabbitMqConsumerService : BackgroundService
             Password = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD") ?? "guest"
         };
 
-        var connection = await factory.CreateConnectionAsync();
+        IConnection? connection = null;
+        while (connection == null && !stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                connection = await factory.CreateConnectionAsync();
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("RabbitMQ no disponible, reintentando en 5 segundos...");
+                await Task.Delay(5000, stoppingToken);
+            }
+        }
+        if (connection == null) return;
 
         /// <summary>
         /// Canal de comunicación con RabbitMQ.

@@ -1,5 +1,7 @@
 # spring.application.name=auth-service
 spring:
+  application:
+    name: auth-service
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: postgres
@@ -30,3 +32,15 @@ auth:
     email: ${AUTH_SERVICE_EMAIL}
     password: ${AUTH_SERVICE_PASSWORD}
     role: ${AUTH_SERVICE_ROLE}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,info
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: auth-service

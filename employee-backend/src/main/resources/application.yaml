@@ -29,3 +29,16 @@ cors:
   hostOne: ${ORIGINONE}
   hostTwo: ${ORIGINTWO}
   hostThree: ${ORIGINTHREE}
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,info
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: employee_microservice

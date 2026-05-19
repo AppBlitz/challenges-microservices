@@ -21,6 +21,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
   db-logs:
     image: mongo:8.2
     restart: unless-stopped
@@ -49,6 +50,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 20s
+
   db-e:
     image: postgres:17
     restart: unless-stopped
@@ -107,6 +109,9 @@ services:
       PORT_LISTEN: ${PORT_DOCKER}
       MYSQL_DBADDR: db-d
       MYSQL_DATABASE: ${MYSQL_DATABASE}
+      OTEL_SERVICE_NAME: service-departments
+      OTEL_EXPORTER_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+      OTEL_PROPAGATORS: tracecontext,baggage
 
   service-employees:
     depends_on:
@@ -138,6 +143,10 @@ services:
       EVENT_TWO: ${EVENT_TWO}
       DIRECT_EXCHANGE: ${EXCHANGE_RABBIT}
       URI_SERVICE_D: http://service-departments:${PORT_DOCKER}
+      OTEL_SERVICE_NAME: employee_microservice
+      OTEL_EXPORTER_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+      OTEL_PROPAGATORS: tracecontext,baggage
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/opentelemetry-javaagent.jar"
 
   service-rabbitmq:
     env_file:
@@ -178,6 +187,10 @@ services:
       AUTH_SERVICE_EMAIL: ${AUTH_SERVICE_EMAIL}
       AUTH_SERVICE_PASSWORD: ${AUTH_SERVICE_PASSWORD}
       AUTH_SERVICE_ROLE: ${AUTH_SERVICE_ROLE}
+      OTEL_SERVICE_NAME: auth-service
+      OTEL_EXPORTER_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+      OTEL_PROPAGATORS: tracecontext,baggage
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/opentelemetry-javaagent.jar"
     depends_on:
       db-e:
         condition: service_healthy
@@ -206,6 +219,9 @@ services:
       MONGO_INITDB_DATABASE: ${DATABASE_NAME}
       MONGO_HOST: db-logs
       MONGO_PORT: ${MONGO_PORT_DOCKER}
+      OTEL_SERVICE_NAME: service-logs
+      OTEL_EXPORTER_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
+      OTEL_PROPAGATORS: tracecontext,baggage
     depends_on:
       service-rabbitmq:
         condition: service_healthy
@@ -218,6 +234,9 @@ services:
       - RABBITMQ_HOST=service-rabbitmq
       - RABBITMQ_USERNAME=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
+      - OTEL_SERVICE_NAME=service-profile
+      - OTEL_EXPORTER_ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+      - OTEL_PROPAGATORS=tracecontext,baggage
     build:
       context: ./management_profile/
       dockerfile: Dockerfile
@@ -227,8 +246,69 @@ services:
       db-profile:
         condition: service_healthy
 
+  # ── OBSERVABILIDAD ────────────────────────────────────────────────────────
+
+  prometheus:
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    depends_on:
+      - auth-service
+      - service-employees
+      - service-departments
+      - service-logs
+      - service-profile
+
+  grafana:
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+      - loki
+
+  loki:
+    image: grafana/loki:latest
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    image: grafana/promtail:latest
+    restart: unless-stopped
+    volumes:
+      - ./observability/promtail/promtail-config.yml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    restart: unless-stopped
+    ports:
+      - "9411:9411"
+
 volumes:
   postgres-data:
   mongo_data:
   mysql-data:
   postgres_data:
+  grafana-data:
