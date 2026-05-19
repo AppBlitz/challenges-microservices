@@ -24,6 +24,11 @@ public class SecurityConfig {
                         // Endpoints públicos
                         .requestMatchers("/auth/**").permitAll()
 
+                        // Observabilidad - permitir sin autenticación
+                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/actuator/prometheus").permitAll()
+                        .requestMatchers("/health").permitAll()
+
                         // Endpoints protegidos
                         .requestMatchers(HttpMethod.GET, "/empleados/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/empleados/**").hasRole("ADMIN")

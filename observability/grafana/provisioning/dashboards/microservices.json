@@ -1,0 +1,152 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 10,
+      "title": "Resumen del Sistema",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": { "color": "red", "text": "DOWN" },
+                "1": { "color": "green", "text": "UP" }
+              },
+              "type": "value"
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 1 },
+      "id": 1,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto"
+      },
+      "title": "Estado de servicios",
+      "type": "stat",
+      "targets": [
+        { "expr": "up{job=\"auth-service\"}", "legendFormat": "auth-service", "refId": "A" },
+        { "expr": "up{job=\"service-employees\"}", "legendFormat": "service-employees", "refId": "B" },
+        { "expr": "up{job=\"service-departments\"}", "legendFormat": "service-departments", "refId": "C" },
+        { "expr": "up{job=\"service-logs\"}", "legendFormat": "service-logs", "refId": "D" },
+        { "expr": "up{job=\"service-profile\"}", "legendFormat": "service-profile", "refId": "E" }
+      ]
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 11,
+      "title": "Comportamiento del Tráfico",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "id": 2,
+      "options": {
+        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "title": "Tasa de peticiones HTTP",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum by (job) (rate(http_server_requests_seconds_count[1m]))",
+          "legendFormat": "{{job}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "id": 3,
+      "options": {
+        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "title": "Latencia promedio",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum by (job) (rate(http_server_requests_seconds_sum[1m])) / sum by (job) (rate(http_server_requests_seconds_count[1m]))",
+          "legendFormat": "{{job}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "lineWidth": 2, "fillOpacity": 10 }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 14 },
+      "id": 4,
+      "options": {
+        "legend": { "calcs": [], "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "title": "Errores HTTP 4xx y 5xx",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum by (job, status) (rate(http_server_requests_seconds_count{status=~\"4..|5..\"}[1m]))",
+          "legendFormat": "{{job}} - {{status}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 38,
+  "tags": ["microservices"],
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Microservices Dashboard",
+  "uid": "microservices-dashboard",
+  "version": 1
+}
