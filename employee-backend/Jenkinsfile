@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-     image 'gradle:8.10-jdk21'
+      image 'gradle:9.4.1-jdk21'
       // args '-v /root/.gradle:/root/.gradle'  // cache de dependencias
       args '''
             -v /root/.gradle:/root/.gradle
@@ -69,25 +69,25 @@ pipeline {
     //   }
     // }
 
-    stage('Package') {
-      steps {
-        script {
-          def tag = "${env.BUILD_NUMBER}"
-                sh """
-                    apt-get update
-                    apt-get install -y docker.io
+    // stage('Package') {
+    //   steps {
+    //     script {
+    //       def tag = "${env.BUILD_NUMBER}"
+    //             sh """
+    //                 apt-get update
+    //                 apt-get install -y docker.io
 
-                    docker build \
-                      -t localhost:5000/employee-backend:${tag} \
-                      -t localhost:5000/employee-backend:latest \
-                      ./employee-backend
+    //                 docker build \
+    //                   -t localhost:5000/employee-backend:${tag} \
+    //                   -t localhost:5000/employee-backend:latest \
+    //                   ./employee-backend
 
-                    docker push localhost:5000/employee-backend:${tag}
+    //                 docker push localhost:5000/employee-backend:${tag}
 
-                    docker push localhost:5000/employee-backend:latest
-                  """        }
-      }
-    }
+    //                 docker push localhost:5000/employee-backend:latest
+    //               """        }
+    //   }
+    // }
   }
 
   post {
