@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'node:20-alpine'
-      args '-v /root/.npm:/root/.npm'
+      args '-v /root/.npm:/root/.npm --network challenges-microservices_microservices-network'
     }
   }
 
