@@ -42,7 +42,7 @@ jobs:
                 branches('*/jahn')
               }
             }
-            scriptPath('microservicio-logs/Jenkinsfile')
+            scriptPath('microservice-logs/Jenkinsfile')
           }
         }
       }
