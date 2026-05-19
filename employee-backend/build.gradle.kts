@@ -1,10 +1,10 @@
 plugins {
 
-	java
-	id("org.springframework.boot") version "4.0.2"
-	id("io.spring.dependency-management") version "1.1.7"
-	id("jacoco")
-	id ("org.sonarqube") version "4.4.1.3373"
+    java
+    id("org.springframework.boot") version "3.5.0"
+    id("io.spring.dependency-management") version "1.1.7"
+    id("jacoco")
+    id("org.sonarqube") version "5.1.0.4882"
 }
 
 group = "com.employee"
@@ -29,7 +29,8 @@ repositories {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
-	implementation("org.springframework.boot:spring-boot-starter-webmvc")
+	// implementation("org.springframework.boot:spring-boot-starter-webmvc")
+	implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.cloud:spring-cloud-starter-openfeign:5.0.1")
 	implementation("org.modelmapper:modelmapper:3.2.6")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.1")
@@ -38,13 +39,14 @@ dependencies {
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("org.postgresql:postgresql")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-  testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+  //testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
 	annotationProcessor("org.projectlombok:lombok")
   testImplementation("org.apache.httpcomponents.client5:httpclient5")
-	testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+	//testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
+	// testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-  testImplementation("org.springframework.boot:spring-boot-starter-amqp-test")
+  //testImplementation("org.springframework.boot:spring-boot-starter-amqp-test")
   developmentOnly("org.springframework.boot:spring-boot-docker-compose")
   testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
       testImplementation("org.springframework.boot:spring-boot-starter-test") {
