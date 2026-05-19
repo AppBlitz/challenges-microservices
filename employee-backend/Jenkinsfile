@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-      image 'gradle:8.14.3-jdk21'
+     image 'gradle:8.10-jdk21'
       // args '-v /root/.gradle:/root/.gradle'  // cache de dependencias
       args '''
             -v /root/.gradle:/root/.gradle
