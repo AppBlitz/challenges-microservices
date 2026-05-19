@@ -1,0 +1,62 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: Discord Alerts
+    receivers:
+      - uid: discord-alerts
+        type: discord
+        settings:
+          url: https://discord.com/api/webhooks/1506168933244211341/iA0_Ld4Jl66AxCBGtIjqJ_0FEeWhnk6bQKDyUk3l0p6vVGHT6vY2bJLJwAiFy19u2jWq
+
+policies:
+  - orgId: 1
+    receiver: Discord Alerts
+
+groups:
+  - orgId: 1
+    name: microservices-alerts
+    folder: Microservices
+    interval: 1m
+    rules:
+      - uid: servicio-caido
+        title: Servicio Caído
+        condition: A
+        for: 1m
+        annotations:
+          summary: "Servicio caído: {{ $labels.job }}"
+          description: "El microservicio {{ $labels.job }} dejó de responder. Instancia: {{ $labels.instance }}"
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: up == 0
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: Alerting
+        execErrState: Alerting
+
+      - uid: alta-tasa-errores
+        title: Alta Tasa de Errores
+        condition: A
+        for: 2m
+        annotations:
+          summary: "Alta tasa de errores: {{ $labels.job }}"
+          description: "El microservicio {{ $labels.job }} está retornando más del 10% de errores 5xx."
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              expr: sum by (job) (rate(http_server_requests_seconds_count{status=~"5.."}[2m])) / sum by (job) (rate(http_server_requests_seconds_count[2m])) > 0.10
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+        noDataState: NoData
+        execErrState: Alerting
