@@ -65,15 +65,27 @@ stage('SonarQube') {
     //   }
     // }
 
-    stage('Package') {
-      steps {
-        script {
-          def tag = "${env.BUILD_NUMBER}"
-          sh "docker build -t localhost:5000/logs-service:${tag} -t localhost:5000/logs-service:latest ./microservice-logs"
-          sh "docker push localhost:5000/logs-service:${tag}"
-        }
-      }
+stage('Package') {
+  steps {
+    script {
+
+      def tag = "${env.BUILD_NUMBER}"
+
+      sh """
+        apk add --no-cache docker-cli
+
+        docker build \
+          -t localhost:5000/logs-service:${tag} \
+          -t localhost:5000/logs-service:latest \
+          ./microservice-logs
+
+        docker push localhost:5000/logs-service:${tag}
+
+        docker push localhost:5000/logs-service:latest
+      """
     }
+  }
+}
   }
 
   post {
