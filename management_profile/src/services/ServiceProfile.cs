@@ -57,6 +57,8 @@ public class ProfileService : IProfileService
     /// </returns>
     public async Task<Profile> AddProfileAsync(Profile profile)
     {
+        profile.Id = Guid.NewGuid().ToString();
+
         profile.FechaCreacion = DateTime.UtcNow;
 
         _context.profiles.Add(profile);
@@ -128,6 +130,7 @@ public class ProfileService : IProfileService
 
         var profile = new Profile
         {
+            Id = Guid.NewGuid().ToString(),
             Name = message
         };
 

@@ -43,25 +43,35 @@ public class RabbitMqConsumerService : BackgroundService
             /// <summary>
             /// Dirección del servidor RabbitMQ.
             /// </summary>
-            HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "localhost",
+            HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "rabbitmq",
             UserName = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME") ?? "guest",
             Password = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD") ?? "guest"
         };
 
-        IConnection? connection = null;
-        while (connection == null && !stoppingToken.IsCancellationRequested)
+        /// <summary>
+        /// Establece la conexión con RabbitMQ, implementando un mecanismo de reintentos
+        /// </summary>
+        IConnection? connection= null;
+
+
+        /// <summary>
+        /// reinttenta kka conexión a RabbitMQ cada 5 segundos en caso de fallo,
+        /// hasta que se establezca correctamente.
+        /// </summary>
+        while (connection == null)
         {
             try
             {
                 connection = await factory.CreateConnectionAsync();
+                Console.WriteLine("Conexión a RabbitMQ establecida exitosamente.");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Console.WriteLine("RabbitMQ no disponible, reintentando en 5 segundos...");
+                Console.WriteLine($"Error al conectar a RabbitMQ: {ex.Message}");
+                Console.WriteLine("Reintentando en 5 segundos...");
                 await Task.Delay(5000, stoppingToken);
             }
         }
-        if (connection == null) return;
 
         /// <summary>
         /// Canal de comunicación con RabbitMQ.
@@ -72,8 +82,8 @@ public class RabbitMqConsumerService : BackgroundService
         /// Declaración de la cola desde la cual se consumen los mensajes.
         /// </summary>
         await channel.QueueDeclareAsync(
-            queue: "hello",
-            durable: true,
+            queue: "employee",
+            durable: false,
             exclusive: false,
             autoDelete: false
         );
@@ -125,6 +135,7 @@ public class RabbitMqConsumerService : BackgroundService
                 try
                 {
                     var employeeMessage = jsonDocument;
+                    Console.WriteLine($"Contenido del mensaje: {employeeMessage.RootElement}");
 
                     if (employeeMessage != null)
                     {
@@ -132,7 +143,7 @@ public class RabbitMqConsumerService : BackgroundService
                         /// Verifica si el perfil ya existe antes de crearlo.
                         /// </summary>
                         var exists = await profileService.GetProfileByIdAsync(
-                            employeeMessage.RootElement.GetProperty("Id").GetString()!
+                            employeeMessage.RootElement.GetProperty("id").ToString()!
                         );
 
                         var perfil_creado = exists != null;
@@ -149,11 +160,12 @@ public class RabbitMqConsumerService : BackgroundService
                         /// <summary>
                         /// Creación automática del perfil basado en el evento recibido.
                         /// </summary>
+                        Console.WriteLine("Creando nuevo perfil para el empleado...");
                         Profile profile = new Profile
                         {
-                            Id = employeeMessage.RootElement.GetProperty("Id").ToString(),
-                            Name = employeeMessage.RootElement.GetProperty("NameUser").GetString(),
-                            Email = employeeMessage.RootElement.GetProperty("Email").GetString()
+                            Id = employeeMessage.RootElement.GetProperty("id").ToString(),
+                            Name = employeeMessage.RootElement.GetProperty("nameUser").GetString(),
+                            Email = employeeMessage.RootElement.GetProperty("email").GetString()
                         };
 
                         await profileService.AddProfileAsync(profile);
@@ -210,19 +222,18 @@ public class RabbitMqConsumerService : BackgroundService
                     /// <summary>
                     /// Procesamiento del evento de eliminación de empleado.
                     /// </summary>
-                    var deleteMessage =
-                        System.Text.Json.JsonSerializer.Deserialize<MessageRabbitDeleteEmployee>(json);
+                    var deleteMessage = jsonDocument;
+                        // System.Text.Json.JsonSerializer.Deserialize<MessageRabbitDeleteEmployee>(json);
 
                     if (deleteMessage != null)
                     {
-                        await profileService.DeleteProfileAsync(deleteMessage.Id.ToString());
+                        await profileService.DeleteProfileAsync(deleteMessage.RootElement.GetProperty("id").ToString());
 
                         /// <summary> Obtengo las variables para el envio del
                         /// correo electrónico tras la eliminación del perfil.
                         /// </summary>
-                        var nombre_empleado = deleteMessage.NameUser;
-                        var email_empleado = deleteMessage.Email;
-
+                        var nombre_empleado = deleteMessage.RootElement.GetProperty("nameUser").GetString();
+                        var email_empleado = deleteMessage.RootElement.GetProperty("email").GetString();
                         /// <summary>
                         /// Envío de notificación por correo electrónico tras la eliminación del perfil.
                         /// </summary>
@@ -274,7 +285,7 @@ public class RabbitMqConsumerService : BackgroundService
         /// Inicio del consumo continuo de mensajes desde la cola.
         /// </summary>
         await channel.BasicConsumeAsync(
-            queue: "hello",
+            queue: "employee",
             autoAck: false,
             consumer: consumer
         );
