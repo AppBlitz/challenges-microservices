@@ -11,17 +11,20 @@ const server = http.createServer({ keepAliveTimeout: 600000 }, async (req, res) 
     const { method, url } = req;
     const path = url.split("/")[1];
 
-    if (method === "GET" && path === "notifications") {
-      notificationController.get_notification_id_employee(req, res);
+      if (method === "GET" && url === "/notifications/delete") {
+          notificationController.get_delete_notification(req, res);
 
-    } else if (method === "GET" && (path === "docs" || path === "swagger.json")) {
-      documentation_controller.documentation_swagger(req, res);
+      } else if (method === "GET" && path === "notifications") {
+          notificationController.get_notification_id_employee(req, res);
+
+      } else if (method === "GET" && (path === "docs" || path === "swagger.json")) {
 
     } else if (method === "GET" && path === "metrics") {
       res.writeHead(200, { "Content-Type": register.contentType });
       res.end(await register.metrics());
 
-    } else if (method === "GET" && path === "health") {
+    }
+     else if (method === "GET" && path === "health") {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({
         status: "UP",
