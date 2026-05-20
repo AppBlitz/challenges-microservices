@@ -146,7 +146,7 @@ services:
       OTEL_SERVICE_NAME: employee_microservice
       OTEL_EXPORTER_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
       OTEL_PROPAGATORS: tracecontext,baggage
-      JAVA_TOOL_OPTIONS: "-javaagent:/app/opentelemetry-javaagent.jar"
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/opentelemetry-javaagent.jar -Dotel.traces.exporter=zipkin -Dotel.exporter.zipkin.endpoint=http://zipkin:9411/api/v2/spans -Dotel.metrics.exporter=none -Dotel.logs.exporter=none"
 
   service-rabbitmq:
     env_file:
@@ -190,7 +190,7 @@ services:
       OTEL_SERVICE_NAME: auth-service
       OTEL_EXPORTER_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
       OTEL_PROPAGATORS: tracecontext,baggage
-      JAVA_TOOL_OPTIONS: "-javaagent:/app/opentelemetry-javaagent.jar"
+      JAVA_TOOL_OPTIONS: "-javaagent:/app/opentelemetry-javaagent.jar -Dotel.traces.exporter=zipkin -Dotel.exporter.zipkin.endpoint=http://zipkin:9411/api/v2/spans -Dotel.metrics.exporter=none -Dotel.logs.exporter=none"
     depends_on:
       db-e:
         condition: service_healthy
