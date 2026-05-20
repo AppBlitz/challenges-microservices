@@ -27,7 +27,7 @@ async function connectionRabbitMq() {
       });
 
       const queue = await channel.assertQueue(rabbitmq_name, {
-        durable: false
+        durable: true
       });
 
       await channel.bindQueue(queue.queue, exchange_rabbit, event_one);

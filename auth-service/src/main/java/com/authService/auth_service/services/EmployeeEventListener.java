@@ -4,7 +4,7 @@ import com.authService.auth_service.model.User;
 import com.authService.auth_service.repository.UserRepository;
 import com.authService.auth_service.utils.JwtUtil;
 
-import org.springframework.amqp.rabbit.annotation.Queue;
+//import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ public class EmployeeEventListener {
         this.jwtUtil = jwtUtil;
     }
 
-    @RabbitListener(queuesToDeclare = @Queue(name = "employee.save", durable = "false"))
+    @RabbitListener(queues = "auth.employee")
     public void handleEmployeeCreated(String email) {
         // Crear usuario con rol USER y sin contraseña válida
         User user = User.builder()
@@ -38,7 +38,7 @@ public class EmployeeEventListener {
         System.out.println("[EVENTO] usuario.creado -> " + email + " token=" + resetToken);
     }
 
-    @RabbitListener(queuesToDeclare = @Queue(name = "employee.delete", durable = "false"))
+    @RabbitListener(queues = "auth.employee")
     public void handleEmployeeDeleted(String email) {
         userRepository.findByEmail(email).ifPresent(user -> {
             user.setEnabled(false);

@@ -38,14 +38,17 @@ public class RabbitMqConsumerService : BackgroundService
     /// </returns>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+
+        
         var factory = new ConnectionFactory
         {
             /// <summary>
             /// Dirección del servidor RabbitMQ.
             /// </summary>
-            HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "rabbitmq",
-            UserName = Environment.GetEnvironmentVariable("RABBITMQ_USERNAME") ?? "guest",
-            Password = Environment.GetEnvironmentVariable("RABBITMQ_PASSWORD") ?? "guest"
+            HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "service-rabbitmq",
+            UserName = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_USER") ?? "mexico",
+            Password = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_PASS") ?? "colombia",
+            
         };
 
         /// <summary>
@@ -81,12 +84,19 @@ public class RabbitMqConsumerService : BackgroundService
         /// <summary>
         /// Declaración de la cola desde la cual se consumen los mensajes.
         /// </summary>
-        await channel.QueueDeclareAsync(
-            queue: "employee",
-            durable: false,
-            exclusive: false,
-            autoDelete: false
-        );
+        /// 
+        var Exchange= Environment.GetEnvironmentVariable("EXCHANGE_RABBIT") ?? "employee.events";
+        var queue= Environment.GetEnvironmentVariable("NAME_QUEUE_PROFILE") ?? "profile.employee";
+        var event_one= Environment.GetEnvironmentVariable("EVENT_ONE") ?? "employee.save";
+        var event_two= Environment.GetEnvironmentVariable("EVENT_TWO") ?? "employee.delete";
+
+        await channel.ExchangeDeclareAsync(Exchange, "direct", durable: false);
+
+        await channel.QueueDeclareAsync(queue, durable: false, exclusive: false, autoDelete: false);
+
+                
+        await channel.QueueBindAsync(queue, Exchange, event_one);
+        await channel.QueueBindAsync(queue, Exchange, event_two);
 
         /// <summary>
         /// Consumidor asincrónico de mensajes.
@@ -128,7 +138,7 @@ public class RabbitMqConsumerService : BackgroundService
             /// Cuando se recibe este evento desde RabbitMQ, se crea automáticamente
             /// un perfil asociado en el microservicio de perfiles si aún no existe.
             /// </summary>
-            if (routingkey == "employee.save")
+            if (routingkey == event_one)
             {
                 Console.WriteLine("Mensaje recibido: Creación de empleado");
 
@@ -139,6 +149,11 @@ public class RabbitMqConsumerService : BackgroundService
 
                     if (employeeMessage != null)
                     {
+                        Console.WriteLine("Procesando creación de perfil para el empleado...");
+                        Console.WriteLine($"Contenido del mensaje: {employeeMessage.RootElement}");
+                        Console.WriteLine($"ID del empleado: {employeeMessage.RootElement.GetProperty("id")}");
+                        Console.WriteLine($"ID del empleado: {employeeMessage.RootElement.GetProperty("id").ToString()}");
+                        Console.WriteLine($"Nombre del empleado: {employeeMessage.RootElement.GetProperty("id").GetString()}");
                         /// <summary>
                         /// Verifica si el perfil ya existe antes de crearlo.
                         /// </summary>
@@ -213,7 +228,7 @@ public class RabbitMqConsumerService : BackgroundService
             /// Cuando se recibe este evento, se elimina el perfil correspondiente
             /// en el microservicio de perfiles.
             /// </summary>
-            else if (routingkey == "employee.delete")
+            else if (routingkey == event_two)
             {
                 Console.WriteLine("Mensaje recibido: Eliminación de empleado");
 
@@ -285,7 +300,7 @@ public class RabbitMqConsumerService : BackgroundService
         /// Inicio del consumo continuo de mensajes desde la cola.
         /// </summary>
         await channel.BasicConsumeAsync(
-            queue: "employee",
+            queue: queue,
             autoAck: false,
             consumer: consumer
         );

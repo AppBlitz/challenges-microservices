@@ -12,10 +12,14 @@ spring:
       hibernate:
         format_sql: true
   rabbitmq:
+    exchange: ${EXCHANGE_RABBIT}
+    name_queue: ${NAME_QUEUE_AUTH}
     host: ${RABBITMQ_HOST}
     port: ${PORTS_CLIENT_RABBIT_EXPOSE}
-    username: ${RABBITMQ_USERNAME}
-    password: ${RABBITMQ_PASSWORD}
+    username: ${RABBITMQ_DEFAULT_USER}
+    password: ${RABBITMQ_DEFAULT_PASS}
+    event_one: ${EVENT_ONE}
+    event_two: ${EVENT_TWO}
 
 jwt:
   secret: ${JWT_SECRET:miClaveSuperSecreta}

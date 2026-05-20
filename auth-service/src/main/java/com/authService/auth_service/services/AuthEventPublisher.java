@@ -8,11 +8,14 @@ import java.util.Map;
 @Service
 public class AuthEventPublisher {
 
-    @Value("${data_rabbit.event_one}")
+    @Value("${event_one}")
     private String event_one;
 
-    @Value("${data_rabbit.event_three}")
+    @Value("${event_three}")
     private String event_three;
+
+    @Value("${exchange_rabbit}")
+    private String exchange;
 
     private final RabbitTemplate rabbitTemplate;
 
@@ -22,11 +25,11 @@ public class AuthEventPublisher {
 
     public void publishUserCreated(String email, String token) {
         Map<String, String> payload = Map.of("email", email, "token", token);
-        rabbitTemplate.convertAndSend(event_one, payload);
+        rabbitTemplate.convertAndSend(exchange, event_one, payload);
     }
 
     public void publishUserRecovery(String email, String token) {
         Map<String, String> payload = Map.of("email", email, "token", token);
-        rabbitTemplate.convertAndSend(event_three, payload);
+        rabbitTemplate.convertAndSend(exchange, event_three, payload);
     }
 }

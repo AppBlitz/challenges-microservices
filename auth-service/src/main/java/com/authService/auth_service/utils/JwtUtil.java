@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
+import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -21,13 +22,13 @@ public class JwtUtil {
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
-                .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)
+                .signWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret)), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public Claims validateToken(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
+                .setSigningKey(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret)))
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -39,7 +40,7 @@ public class JwtUtil {
                 .claim("type", "RESET_PASSWORD")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 15 * 60 * 1000)) // 15 minutos
-                .signWith(Keys.hmacShaKeyFor(secret.getBytes()), SignatureAlgorithm.HS256)
+                .signWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret)), SignatureAlgorithm.HS256)
                 .compact();
     }
 

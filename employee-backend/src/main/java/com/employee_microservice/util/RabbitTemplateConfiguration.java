@@ -16,17 +16,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitTemplateConfiguration {
 
-    @Value("${spring.rabbitmq.name_queue}")
+    @Value("${name_queue}")
     private String name_queue;
 
-    @Value("${spring.rabbitmq.direct_exchange}")
+    @Value("${direct_exchange}")
     private String direct_exchange;
 
-    @Value("${spring.rabbitmq.event_two}")
-    private String event_two;
-
-    @Value("${spring.rabbitmq.event_one}")
+    @Value("${event_one}")
     private String event_one;
+
+    @Value("${event_two}")
+    private String event_two;
 
     /**
      * Creates a Direct Exchange where messages are routed based on a specific
@@ -36,7 +36,7 @@ public class RabbitTemplateConfiguration {
      */
     @Bean
     DirectExchange direct() {
-        return new DirectExchange(direct_exchange.toString());
+        return new DirectExchange(direct_exchange);
     }
 
     /**
@@ -46,7 +46,7 @@ public class RabbitTemplateConfiguration {
      */
     @Bean
     Queue createQueue() {
-        return new Queue(name_queue.toString(), false);
+        return new Queue(name_queue, true);
     }
 
     /**
@@ -54,15 +54,15 @@ public class RabbitTemplateConfiguration {
      * This is typically used for "save" or "create" events.
      * 
      * @param direct            The defined Direct Exchange.
-     * @param saveEmployeeQueue The target Queue.
+     * @param createQueue The target Queue.
      * @return A {@link Binding} between the exchange and queue.
      */
     @Bean
     public Binding binding1a(DirectExchange direct,
-            Queue saveEmployeeQueue) {
-        return BindingBuilder.bind(saveEmployeeQueue)
+            Queue createQueue) {
+        return BindingBuilder.bind(createQueue)
                 .to(direct)
-                .with(event_one.toString());
+                .with(event_one);
     }
 
     /**
@@ -70,13 +70,13 @@ public class RabbitTemplateConfiguration {
      * This is typically used for "delete" events.
      * 
      * @param direct         The defined Direct Exchange.
-     * @param deleteEmployee The target Queue.
+     * @param createQueue The target Queue.
      * @return A {@link Binding} between the exchange and queue.
      */
     @Bean
-    public Binding binding2a(DirectExchange direct, Queue deleteEmployee) {
-        return BindingBuilder.bind(deleteEmployee)
+    public Binding binding2a(DirectExchange direct, Queue createQueue) {
+        return BindingBuilder.bind(createQueue)
                 .to(direct)
-                .with(event_two.toString());
+                .with(event_two);
     }
 }

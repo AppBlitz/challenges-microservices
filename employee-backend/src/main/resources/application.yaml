@@ -16,14 +16,14 @@ spring:
         dialect: ${HIBERNATE_DIALECT}
 
   rabbitmq:
-    username: ${RABBIT_USERNAME}
-    password: ${RABBIT_PASSWORD}
-    host: ${RABBIT_HOST}
-    port: ${RABBIT_PORT}
-    name_queue: ${NAME_QUEUE}
+    username: ${RABBITMQ_DEFAULT_USER}
+    password: ${RABBITMQ_DEFAULT_PASS}
+    host: ${RABBITMQ_HOST}
+    port: ${PORTS_CLIENT_RABBIT_DOCKER}
     event_one: ${EVENT_ONE}
     event_two: ${EVENT_TWO}
-    direct_exchange: ${DIRECT_EXCHANGE}
+    direct_exchange: ${EXCHANGE_RABBIT}
+    name_queue: ${NAME_QUEUE}
 
 cors:
   hostOne: ${ORIGINONE}
