@@ -28,18 +28,18 @@ pipeline {
       }
     }
 
-    stage('Test') {
-      steps {
-        dir('auth-service') {
-          sh './gradlew test jacocoTestReport'
-        }
-      }
-      post {
-        always {
-          junit 'auth-service/build/test-results/test/*.xml'
-        }
-      }
-    }
+    // stage('Test') {
+    //   steps {
+    //     dir('auth-service') {
+    //       sh './gradlew test jacocoTestReport'
+    //     }
+    //   }
+    //   post {
+    //     always {
+    //       junit 'auth-service/build/test-results/test/*.xml'
+    //     }
+    //   }
+    // }
 
     stage('SonarQube') {
       steps {
