@@ -46,6 +46,21 @@ public class ProfileService : IProfileService
     }
 
     /// <summary>
+    /// Obtiene un perfil específico a partir del ID del empleado asociado.
+    /// </summary>
+    /// <param name="empleadoId">
+    /// ID del empleado para el cual buscar el perfil.
+    /// </param>
+    /// <returns>
+    /// El perfil encontrado o null si no existe.
+    /// </returns>
+    public async Task<Profile?> GetProfileByEmpleadoIdAsync(string empleadoId)
+    {
+        return await _context.profiles
+            .FirstOrDefaultAsync(p => p.EmpleadoId == empleadoId);
+    }
+
+    /// <summary>
     /// Crea un nuevo perfil en la base de datos.
     /// Asigna automáticamente la fecha de creación antes de persistir el registro.
     /// </summary>
@@ -79,12 +94,19 @@ public class ProfileService : IProfileService
     /// </returns>
     public async Task<Profile?> UpdateProfileAsync(Profile profile)
     {
-        var existing = await _context.profiles.FindAsync(profile.Id);
+        var existing = await _context.profiles
+            .FirstOrDefaultAsync(p => p.EmpleadoId == profile.EmpleadoId);
 
         if (existing == null)
             return null;
 
-        _context.Entry(existing).CurrentValues.SetValues(profile);
+        // actualiza solo los campos editables directamente
+        existing.Name      = profile.Name;
+        existing.Biografia = profile.Biografia;
+        existing.Ciudad    = profile.Ciudad;
+        existing.Direccion = profile.Direccion;
+        existing.Telefono  = profile.Telefono;
+        existing.Email     = profile.Email;
 
         await _context.SaveChangesAsync();
 
@@ -100,9 +122,9 @@ public class ProfileService : IProfileService
     /// <returns>
     /// true si el perfil fue eliminado correctamente; false si no existe.
     /// </returns>
-    public async Task<bool> DeleteProfileAsync(string id)
+    public async Task<bool> DeleteProfileAsync(string EmpleadoId)
     {
-        var profile = await _context.profiles.FindAsync(id);
+        var profile = await _context.profiles.FirstOrDefaultAsync(p => p.EmpleadoId == EmpleadoId);
 
         if (profile == null)
             return false;

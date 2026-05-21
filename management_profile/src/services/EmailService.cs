@@ -138,12 +138,12 @@ public class EmailService : IEmailService
                 /// <summary>
                 /// Asunto del correo electrónico.
                 /// </summary>
-                Subject = "Perfil eliminado correctamente",
+                Subject = "Perfil desvinculado correctamente",
 
                 /// <summary>
                 /// Contenido del mensaje enviado al usuario.
                 /// </summary>
-                Body = $"Hola {name}, para notificarte que tu perfil ha sido eliminado.",
+                Body = $"Hola {name}, para notificarte que tu perfil ha sido desvinculado.",
 
                 /// <summary>
                 /// Indica si el cuerpo del mensaje está en formato HTML.

@@ -25,6 +25,17 @@ public interface IProfileService
     Task<Profile?> GetProfileByIdAsync(string id);
 
     /// <summary>
+    /// Obtiene un perfil específico a partir de su identificador único.
+    /// </summary>
+    /// <param name="empleadoId">
+    /// Identificador único del empleado para el cual buscar el perfil.
+    /// </param>
+    /// <returns>
+    /// El perfil encontrado o null si no existe en la base de datos.
+    /// </returns>
+    Task<Profile?> GetProfileByEmpleadoIdAsync(string empleadoId);
+
+    /// <summary>
     /// Crea un nuevo perfil en el sistema.
     /// </summary>
     /// <param name="profile">

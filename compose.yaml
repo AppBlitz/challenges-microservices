@@ -225,6 +225,9 @@ services:
       - NAME_QUEUE_PROFILE=${NAME_QUEUE_PROFILE}
       - EVENT_ONE=${EVENT_ONE}
       - EVENT_TWO=${EVENT_TWO}
+      - EmailSettings__Email=${EMAIL}
+      - EmailSettings__Password=${PASSWORD}
+      
     build:
       context: ./management_profile/
       dockerfile: Dockerfile

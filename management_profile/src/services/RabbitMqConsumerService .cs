@@ -2,6 +2,8 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Microsoft.VisualBasic;
 
 /// <summary>
 /// Servicio en segundo plano encargado de consumir mensajes desde RabbitMQ.
@@ -151,15 +153,15 @@ public class RabbitMqConsumerService : BackgroundService
                     {
                         Console.WriteLine("Procesando creación de perfil para el empleado...");
                         Console.WriteLine($"Contenido del mensaje: {employeeMessage.RootElement}");
-                        Console.WriteLine($"ID del empleado: {employeeMessage.RootElement.GetProperty("id")}");
                         /// <summary>
                         /// Verifica si el perfil ya existe antes de crearlo.
                         /// </summary>
-                        var exists = await profileService.GetProfileByIdAsync(
+
+                        var existingProfile = await profileService.GetProfileByEmpleadoIdAsync(
                             employeeMessage.RootElement.GetProperty("id").ToString()!
                         );
 
-                        var perfil_creado = exists != null;
+                        var perfil_creado = existingProfile != null;
 
                         if (perfil_creado)
                         {
@@ -176,7 +178,7 @@ public class RabbitMqConsumerService : BackgroundService
                         Console.WriteLine("Creando nuevo perfil para el empleado...");
                         Profile profile = new Profile
                         {
-                            Id = employeeMessage.RootElement.GetProperty("id").ToString(),
+                            EmpleadoId = employeeMessage.RootElement.GetProperty("id").ToString(),
                             Name = employeeMessage.RootElement.GetProperty("nameUser").GetString(),
                             Email = employeeMessage.RootElement.GetProperty("email").GetString()
                         };
@@ -232,6 +234,7 @@ public class RabbitMqConsumerService : BackgroundService
 
                 try
                 {
+                    Console.WriteLine($"Contenido del mensaje: {jsonDocument.RootElement}");
                     /// <summary>
                     /// Procesamiento del evento de eliminación de empleado.
                     /// </summary>
@@ -240,18 +243,32 @@ public class RabbitMqConsumerService : BackgroundService
 
                     if (deleteMessage != null)
                     {
-                        await profileService.DeleteProfileAsync(deleteMessage.RootElement.GetProperty("id").ToString());
+                        var exists = await profileService.GetProfileByEmpleadoIdAsync(
+                            deleteMessage.RootElement.GetProperty("id_employee").ToString()!
+                        );
+                        if (exists == null)
+                        {
+                            Console.WriteLine("Perfil no encontrado, ignorando mensaje de eliminación");
+
+                            await channel.BasicAckAsync(ea.DeliveryTag, false);
+
+                            return;
+                        }
+                        
+                        Console.WriteLine("Eliminando perfil asociado al empleado...");
+                        await profileService.DeleteProfileAsync(deleteMessage.RootElement.GetProperty("id_employee").ToString());
 
                         /// <summary> Obtengo las variables para el envio del
                         /// correo electrónico tras la eliminación del perfil.
                         /// </summary>
-                        var nombre_empleado = deleteMessage.RootElement.GetProperty("nameUser").GetString();
-                        var email_empleado = deleteMessage.RootElement.GetProperty("email").GetString();
+                        var nombre_empleado = deleteMessage.RootElement.GetProperty("name_employee").GetString();
+                        var email_empleado = deleteMessage.RootElement.GetProperty("email_employee").GetString();
                         /// <summary>
                         /// Envío de notificación por correo electrónico tras la eliminación del perfil.
                         /// </summary>
                         if (email_empleado != null && nombre_empleado != null)
                         {
+                            Console.WriteLine("Enviando correo de notificación por eliminación de perfil...");
                             await emailService.SendProfileDeletedEmailAsync(
                                 email_empleado,
                                 nombre_empleado

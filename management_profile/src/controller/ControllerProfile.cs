@@ -54,7 +54,7 @@ public class ProfilesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<Profile>> GetProfile(string id)
     {
-        var profile = await _profileService.GetProfileByIdAsync(id);
+        var profile = await _profileService.GetProfileByEmpleadoIdAsync(id);
 
         if (profile == null)
             return NotFound();
@@ -114,7 +114,7 @@ public class ProfilesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<Profile>> UpdateProfile(string id, Profile profile)
     {
-        if (id != profile.Id)
+        if (id != profile.EmpleadoId)
             return BadRequest();
 
         var actualizado = await _profileService.UpdateProfileAsync(profile);
