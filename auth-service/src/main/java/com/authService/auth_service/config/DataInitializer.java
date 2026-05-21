@@ -33,6 +33,16 @@ public class DataInitializer {
                         .build();
                 userRepository.save(admin);
             }
+
+            if (userRepository.findByEmail("empleado@test.com").isEmpty()) {
+                User empleado = User.builder()
+                        .email("empleado@test.com")
+                        .password(passwordEncoder.encode("user123"))
+                        .role("USER")
+                        .enabled(true)
+                        .build();
+                userRepository.save(empleado);
+            }
         };
     }
 }

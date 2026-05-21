@@ -17,5 +17,7 @@ node_modules/
 mongo
 enviroment.md
 
+.idea/
+
 #pruebas requests
 requests/

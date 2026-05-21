@@ -22,7 +22,9 @@ async function connectionRabbitMq() {
       const connection = await connect(url, options);
       const channel = await connection.createChannel();
 
-      await channel.assertExchange(exchange_rabbit, "direct", { durable: true });
+      await channel.assertExchange(exchange_rabbit, "direct", {
+        durable: true
+      });
 
       const queue = await channel.assertQueue(rabbitmq_name, {
         durable: true
@@ -30,6 +32,12 @@ async function connectionRabbitMq() {
 
       await channel.bindQueue(queue.queue, exchange_rabbit, event_one);
       await channel.bindQueue(queue.queue, exchange_rabbit, event_two);
+
+        // Cola dedicada para eventos de eliminación
+        const queue_delete = await channel.assertQueue("service_logs_delete", {
+            durable: false
+        });
+        await channel.bindQueue(queue_delete.queue, exchange_rabbit, event_two);
 
       channel.consume(queue.queue, (message) => {
         if (message !== null) {
@@ -46,14 +54,23 @@ async function connectionRabbitMq() {
                   date_enter: message_json.dateEnter
                 }
               ));
-              console.log("NOTIFICATION" + " Tipo:BIENVENIDA | " + "para: " + message_json.email + " Mensaje: Bienvenido" + message_json.nameUser)
-              break;
-            case event_two:
-              const employee_delete = new DeleteEmployee(message_json.id_employee, message_json.name_employee, message_json.email_employee);
-              console.log("[NOTIFICATION]" + " tipo: DESVINCULACIÓN" + " para: " + employee_delete.getEmail() + " | " + "Mensaje: Su cuenta ha sido aliminada " + employee_delete.getName())
-              break;
-            default:
-              break;
+                console.log("NOTIFICATION Tipo:BIENVENIDA | para: " + message_json.email)
+                break;
+              case event_two:
+                  const employee_delete = new DeleteEmployee(
+                      message_json.id_employee,
+                      message_json.name_employee,
+                      message_json.email_employee
+                  );
+                  insert_log_delete_employee({
+                      id_employee: employee_delete.getId(),
+                      name_employee: employee_delete.getName(),
+                      email_employee: employee_delete.getEmail()
+                  });
+                  console.log("[NOTIFICATION] tipo: DESVINCULACIÓN para: " + employee_delete.getEmail())
+                  break;
+              default:
+                  break;
           }
         }
       }, { noAck: true });

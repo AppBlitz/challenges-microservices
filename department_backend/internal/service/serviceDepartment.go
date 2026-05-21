@@ -2,6 +2,9 @@
 package service
 
 import (
+
+   // "math/rand"
+  //  "time"
 	"github.com/AppBlitz/department_backend/internal/model"
 	"github.com/AppBlitz/department_backend/internal/repository"
 )
@@ -31,6 +34,11 @@ func (departS *DepartmentService) SearchDepartmentID(id int64) (*model.Departmen
 // FinAllDepartments retrieves all department records from the data source
 // and returns them as a slice of department pointers.
 func (departS *DepartmentService) FinAllDepartments() ([]*model.Department, error) {
+	// Latencia artificial para simulación de caos
+    //    if rand.Float64() < 0.5 {
+     //       time.Sleep(3 * time.Second)
+    //    }
+
 	departmens, err := departS.repos.FindAll()
 	if err != nil {
 		return nil, err

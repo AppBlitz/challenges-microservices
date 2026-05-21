@@ -1,0 +1,67 @@
+---Ver la cantidad de departamentos que hay---
+
+docker exec -it challenges-microservices-db-d-1 mysql -u carlos -pdepartments12345 departments -e "SELECT * FROM departments;"
+
+---Agregar departamento---
+
+docker exec -it challenges-microservices-db-d-1 mysql -u carlos -pdepartments12345 departments -e "INSERT INTO departments (id, name, description) VALUES (1, 'IT', 'Departamento de Tecnología e Informática');"
+
+---Ver cuales empleados hay---
+
+docker exec -it challenges-microservices-db-e-1 psql -U carlos -d employees -c "SELECT email, role, enabled FROM users;"
+
+----Realizar prueba de latencia---
+
+$token = (Invoke-RestMethod -Method POST -Uri "http://localhost:8086/auth/login" -ContentType "application/json" -Body '{"email":"admin@empresa.com","password":"admin123"}').token
+
+Invoke-RestMethod -Method POST -Uri "http://localhost:8081/employee/save/" `
+  -ContentType "application/json" `
+  -Headers @{Authorization="Bearer $token"} `
+  -Body '{"id_employee":10,"name_one":"Ana","other_name":"Maria","first_surname":"Gomez","second_surname":"Lopez","telephone":"3001234567","address":"Calle 123","postcode":110111,"email":"ana@empresa.com","city_name":"Bogota","position_name":"Developer","department_id":1}'
+
+for ($i = 1; $i -le 10; $i++) {
+  Invoke-RestMethod -Uri "http://localhost:8081/employee/all/" -Headers @{Authorization="Bearer $token"}
+  Write-Host "Request $i completado"
+}
+
+
+---Llamadas HTTP desde la terminal---
+
+# Token
+$token = (Invoke-RestMethod -Method POST -Uri "http://localhost:8086/auth/login" -ContentType "application/json" -Body '{"email":"admin@empresa.com","password":"admin123"}').token
+
+# AUTH
+Invoke-RestMethod -Method POST -Uri "http://localhost:8086/auth/login" -ContentType "application/json" -Body '{"email":"admin@empresa.com","password":"admin123"}'
+
+Invoke-RestMethod -Method POST -Uri "http://localhost:8086/auth/recover-password" -ContentType "application/json" -Body '{"email":"admin@empresa.com"}'
+
+Invoke-RestMethod -Method POST -Uri "http://localhost:8086/auth/reset-password" -ContentType "application/json" -Body '{"token":"TOKEN_AQUI","newPassword":"NuevaPassword123"}'
+
+# DEPARTMENTS
+Invoke-RestMethod -Method POST -Uri "http://localhost:8083/department/save/" -ContentType "application/json" -Body '{"id":2,"name":"Tecnologia","description":"Departamento de desarrollo"}'
+
+Invoke-RestMethod -Method GET -Uri "http://localhost:8083/department/search/1/"
+
+Invoke-RestMethod -Method GET -Uri "http://localhost:8083/department/all/"
+
+# EMPLOYEES
+Invoke-RestMethod -Method POST -Uri "http://localhost:8081/employee/save/" -ContentType "application/json" -Headers @{Authorization="Bearer $token"} -Body '{"id_employee":1,"name_one":"Carlos","other_name":"Fabian","first_surname":"Corrales","second_surname":"Zapata","telephone":"3001234567","address":"Calle 10 #20-30","postcode":630001,"email":"carlos@empresa.com","city_name":"Armenia","position_name":"Developer","department_id":1}'
+
+Invoke-RestMethod -Method GET -Uri "http://localhost:8081/employee/retrieve/8" -Headers @{Authorization="Bearer $token"}
+
+Invoke-RestMethod -Method GET -Uri "http://localhost:8081/employee/all/" -Headers @{Authorization="Bearer $token"}
+
+Invoke-RestMethod -Method DELETE -Uri "http://localhost:8081/employee/delete/8" -Headers @{Authorization="Bearer $token"}
+
+# PROFILE
+Invoke-RestMethod -Method GET -Uri "http://localhost:5095/api/profiles"
+
+Invoke-RestMethod -Method GET -Uri "http://localhost:5095/api/profiles/8"
+
+Invoke-RestMethod -Method GET -Uri "http://localhost:5095/api/profiles/1"
+
+
+
+
+
+

@@ -1,5 +1,4 @@
-FROM gradle:8.14-jdk21 AS build
-
+FROM gradle:9.3.0-jdk21 AS build
 
 WORKDIR /home/gradle/src
 
@@ -15,10 +14,12 @@ WORKDIR  /app
 
 COPY  --from=build /home/gradle/src/build/libs/*-SNAPSHOT.jar app.jar
 
+ADD https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.4.0/opentelemetry-javaagent.jar opentelemetry-javaagent.jar
+
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-javaagent:/app/opentelemetry-javaagent.jar", "-jar", "app.jar"]
 
 
 

@@ -1,10 +1,9 @@
 plugins {
-
 	java
 	id("org.springframework.boot") version "4.0.2"
 	id("io.spring.dependency-management") version "1.1.7"
-	id("jacoco")
-	id("org.sonarqube") version "5.0.0.4638"
+    id("jacoco")
+    id("org.sonarqube") version "5.0.0.4638"
 }
 
 group = "com.employee"
@@ -46,18 +45,20 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
   testImplementation("org.springframework.boot:spring-boot-starter-amqp-test")
   developmentOnly("org.springframework.boot:spring-boot-docker-compose")
-  testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
-      testImplementation("org.springframework.boot:spring-boot-starter-test") {
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
     testImplementation("org.mockito:mockito-core:5.11.0")
 
-
+    // Observabilidad
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 }
 
 tasks.withType<Test> {
 	useJUnitPlatform()
-
 }
 
 jacoco {
@@ -67,7 +68,7 @@ jacoco {
 tasks.jacocoTestReport {
     reports {
         xml.required.set(true)
-        html.required.set(true)	
+        html.required.set(true)
     }
 }
 

@@ -16,14 +16,23 @@ public class SecurityConfig {
     public SecurityConfig(JwtFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
     }
-
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Endpoints públicos
+                        /// Endpoints públicos
+                        /*.requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/auth/recover-password").permitAll()
+                        .requestMatchers("/auth/reset-password").permitAll()
+
+                         */
                         .requestMatchers("/auth/**").permitAll()
+
+                        // Observabilidad - permitir sin autenticación
+                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/actuator/prometheus").permitAll()
+                        .requestMatchers("/health").permitAll()
 
                         // Endpoints protegidos
                         .requestMatchers(HttpMethod.GET, "/empleados/**").hasAnyRole("USER", "ADMIN")

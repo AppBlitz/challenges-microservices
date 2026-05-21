@@ -15,12 +15,18 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "@opentelemetry/auto-instrumentations-node": "^0.56.0",
+    "@opentelemetry/exporter-zipkin": "^1.30.0",
+    "@opentelemetry/resources": "^1.30.0",
+    "@opentelemetry/sdk-node": "^0.57.0",
+    "@opentelemetry/semantic-conventions": "^1.30.0",
     "amqplib": "^1.0.3",
     "cassandra-driver": "^4.8.0",
     "mongoose": "^9.6.1",
     "nodemailer": "^8.0.7",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-dist": "^5.32.5"
+    "swagger-ui-dist": "^5.32.5",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "jest": "^30.4.2",

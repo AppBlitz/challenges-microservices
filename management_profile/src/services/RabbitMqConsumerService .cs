@@ -41,7 +41,7 @@ public class RabbitMqConsumerService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
 
-        
+
         var factory = new ConnectionFactory
         {
             /// <summary>
@@ -50,7 +50,7 @@ public class RabbitMqConsumerService : BackgroundService
             HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST") ?? "service-rabbitmq",
             UserName = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_USER") ?? "mexico",
             Password = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_PASS") ?? "colombia",
-            
+
         };
 
         /// <summary>
@@ -58,7 +58,7 @@ public class RabbitMqConsumerService : BackgroundService
         /// </summary>
         IConnection? connection= null;
 
-        
+
         /// <summary>
         /// reinttenta kka conexión a RabbitMQ cada 5 segundos en caso de fallo,
         /// hasta que se establezca correctamente.
@@ -86,7 +86,7 @@ public class RabbitMqConsumerService : BackgroundService
         /// <summary>
         /// Declaración de la cola desde la cual se consumen los mensajes.
         /// </summary>
-        /// 
+        ///
         var Exchange= Environment.GetEnvironmentVariable("EXCHANGE_RABBIT") ?? "employee.events";
         var queue= Environment.GetEnvironmentVariable("NAME_QUEUE_PROFILE") ?? "profile.employee";
         var event_one= Environment.GetEnvironmentVariable("EVENT_ONE") ?? "employee.save";
@@ -96,7 +96,7 @@ public class RabbitMqConsumerService : BackgroundService
 
         await channel.QueueDeclareAsync(queue, durable: true, exclusive: false, autoDelete: false);
 
-                
+
         await channel.QueueBindAsync(queue, Exchange, event_one);
         await channel.QueueBindAsync(queue, Exchange, event_two);
 
@@ -254,7 +254,7 @@ public class RabbitMqConsumerService : BackgroundService
 
                             return;
                         }
-                        
+
                         Console.WriteLine("Eliminando perfil asociado al empleado...");
                         await profileService.DeleteProfileAsync(deleteMessage.RootElement.GetProperty("id_employee").ToString());
 

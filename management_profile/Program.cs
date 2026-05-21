@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using Prometheus;
 
 /// <summary>
 /// Punto de entrada principal del microservicio de perfiles.
@@ -6,6 +9,37 @@ using Microsoft.EntityFrameworkCore;
 /// el consumidor de RabbitMQ, el servicio de correo electrónico y la documentación OpenAPI.
 /// </summary>
 var builder = WebApplication.CreateBuilder(args);
+
+/// <summary>
+/// Configura el comportamiento de los servicios en segundo plano
+/// para que no detengan la aplicación en caso de excepciones no controladas.
+/// Mas específicamente, el servicio de consumo de RabbitMQ.
+/// </summary>
+builder.Services.Configure<HostOptions>(options =>
+{
+    options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
+});
+
+/// <summary>
+/// Configura OpenTelemetry para trazabilidad distribuida.
+/// Exporta las trazas al servidor Zipkin definido en la configuración.
+/// </summary>
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing => tracing
+        .SetResourceBuilder(ResourceBuilder.CreateDefault()
+            .AddService(builder.Configuration["OTEL_SERVICE_NAME"] ?? "service-profile"))
+        .AddAspNetCoreInstrumentation()
+        .AddZipkinExporter(options =>
+        {
+            options.Endpoint = new Uri(
+                builder.Configuration["OTEL_EXPORTER_ZIPKIN_ENDPOINT"]
+                ?? "http://zipkin:9411/api/v2/spans");
+        }));
+
+/// <summary>
+/// Agrega health checks para monitorear el estado del servicio.
+/// </summary>
+builder.Services.AddHealthChecks();
 
 /// <summary>
 /// Agrega soporte para documentación automática de la API mediante OpenAPI.
@@ -32,17 +66,6 @@ builder.Services.AddDbContext<DataContext>(options =>
 /// de dependencias para permitir su inyección en controladores y servicios.
 /// </summary>
 builder.Services.AddScoped<IProfileService, ProfileService>();
-
-/// <summary>
-/// Configura el comportamiento de los servicios en segundo plano
-/// para que no detengan la aplicación en caso de excepciones no controladas.
-/// mas específicamente, el servicio de consumo de RabbitMQ
-/// </summary>
-builder.Services.Configure<HostOptions>(options =>
-{
-    options.BackgroundServiceExceptionBehavior =
-        BackgroundServiceExceptionBehavior.Ignore;
-});
 
 /// <summary>
 /// Registra el servicio en segundo plano encargado de consumir mensajes
@@ -73,7 +96,6 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<DataContext>();
-
     db.Database.Migrate();
 }
 
@@ -95,6 +117,21 @@ if (app.Environment.IsDevelopment())
 /// Mejora la seguridad en las comunicaciones cliente-servidor.
 /// </summary>
 app.UseHttpsRedirection();
+
+/// <summary>
+/// Habilita la recolección de métricas HTTP para Prometheus.
+/// </summary>
+app.UseHttpMetrics();
+
+/// <summary>
+/// Expone el endpoint de métricas Prometheus en /metrics.
+/// </summary>
+app.MapMetrics("/metrics");
+
+/// <summary>
+/// Expone el endpoint de health check en /health.
+/// </summary>
+app.MapHealthChecks("/health");
 
 /// <summary>
 /// Mapea los endpoints definidos en los controladores REST.

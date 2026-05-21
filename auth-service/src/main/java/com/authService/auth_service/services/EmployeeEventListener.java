@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,48 +30,63 @@ public class EmployeeEventListener {
         this.jwtUtil = jwtUtil;
     }
 
-    @RabbitListener(queues = "auth.employee")
-    public void handleEmployeeEvent(Message message) throws Exception {
-        String routingKey = message.getMessageProperties().getReceivedRoutingKey();
-        String body = new String(message.getBody());
-        JsonNode json = objectMapper.readTree(body);
+    @RabbitListener(queuesToDeclare = @Queue(name = "employee.save", durable = "true"))
+    public void handleEmployeeCreated(Message message) {
+        try {
+            String routingKey = message.getMessageProperties().getReceivedRoutingKey();
+            String body = new String(message.getBody());
+            JsonNode json = objectMapper.readTree(body);
 
-        if (routingKey.equals(eventOne)) {
-            String email = json.get("email").asText();          
-            handleEmployeeCreated(email);
+            if (!routingKey.equals(eventOne)) {
+                System.out.println("[WARN] routing key inesperada en employee.save: " + routingKey);
+                return;
+            }
 
-        } else if (routingKey.equals(eventTwo)) {
-            String email = json.get("email_employee").asText(); 
-            handleEmployeeDeleted(email);
+            String email = json.get("email").asText();
 
-        } else {
-            System.out.println("[WARN] routing key desconocida: " + routingKey);
-        }
-    }
+            if (userRepository.findByEmail(email).isPresent()) {
+                System.out.println("[SKIP] usuario ya existe: " + email);
+                return;
+            }
 
-    private void handleEmployeeCreated(String email) {
-        if (userRepository.findByEmail(email).isPresent()) {
-            System.out.println("[SKIP] usuario ya existe: " + email);
-            return;
-        }
-
-        User user = User.builder()
-                .email(email)
-                .password("")
-                .role("USER")
-                .enabled(true)
-                .build();
-        userRepository.save(user);
-
-        String resetToken = jwtUtil.generateResetToken(email);
-        System.out.println("[EVENTO] usuario.creado -> " + email + " token=" + resetToken);
-    }
-
-    private void handleEmployeeDeleted(String email) {
-        userRepository.findByEmail(email).ifPresent(user -> {
-            user.setEnabled(false);
+            User user = User.builder()
+                    .email(email)
+                    .password("")
+                    .role("USER")
+                    .enabled(true)
+                    .build();
             userRepository.save(user);
-        });
-        System.out.println("[EVENTO] usuario.inhabilitado -> " + email);
+
+            String resetToken = jwtUtil.generateResetToken(email);
+            System.out.println("[EVENTO] usuario.creado -> " + email + " token=" + resetToken);
+
+        } catch (Exception e) {
+            System.out.println("[ERROR] Error procesando mensaje employee.save: " + e.getMessage());
+        }
+    }
+
+    @RabbitListener(queuesToDeclare = @Queue(name = "employee.delete", durable = "true"))
+    public void handleEmployeeDeleted(Message message) {
+        try {
+            String routingKey = message.getMessageProperties().getReceivedRoutingKey();
+            String body = new String(message.getBody());
+            JsonNode json = objectMapper.readTree(body);
+
+            if (!routingKey.equals(eventTwo)) {
+                System.out.println("[WARN] routing key inesperada en employee.delete: " + routingKey);
+                return;
+            }
+
+            String email = json.get("email_employee").asText();
+
+            userRepository.findByEmail(email).ifPresent(user -> {
+                user.setEnabled(false);
+                userRepository.save(user);
+            });
+            System.out.println("[EVENTO] usuario.inhabilitado -> " + email);
+
+        } catch (Exception e) {
+            System.out.println("[ERROR] Error procesando mensaje employee.delete: " + e.getMessage());
+        }
     }
 }
