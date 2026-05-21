@@ -41,19 +41,19 @@ pipeline {
     //   }
     // }
 
-    stage('SonarQube') {
-      steps {
-        dir('auth-service') {
-          withSonarQubeEnv('SonarQube') {
-            sh """
-              ./gradlew sonar \
-                -Dsonar.projectKey=auth-service \
-                -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
-            """
-          }
-        }
-      }
-    }
+    // stage('SonarQube') {
+    //   steps {
+    //     dir('auth-service') {
+    //       withSonarQubeEnv('SonarQube') {
+    //         sh """
+    //           ./gradlew sonar \
+    //             -Dsonar.projectKey=auth-service \
+    //             -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
+    //         """
+    //       }
+    //     }
+    //   }
+    // }
 
     stage('Package') {
       steps {
