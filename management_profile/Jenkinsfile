@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-      image 'mcr.microsoft.com/dotnet/sdk:9.0'
+      image 'mcr.microsoft.com/dotnet/sdk:10.0'  // ← de 9.0 a 10.0
       args '''
             -v /root/.nuget:/root/.nuget
             -v /var/run/docker.sock:/var/run/docker.sock
