@@ -26,7 +26,7 @@ const schema_logs_delete = new Schema({
 })
 
 const save_log_employee = mongoose.model("logs", schema_logs)
-const save_log_delete_employee = mongoose.model("logs_delete", schema_logs_delete)
+const save_log_delete_employee = mongoose.model("logs_delete", schema_logs_delete, "logs_deletes")
 
 async function save_employee_save_logs(Log) {
     try {

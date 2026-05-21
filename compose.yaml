@@ -246,6 +246,29 @@ services:
       db-profile:
         condition: service_healthy
 
+  # ── GATEWAY ────────────────────────────────────────────────────────
+
+  api-gateway:
+    build: ./api-gateway/
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      JWT_SECRET: ${JWT_SECRET}
+      AUTH_SERVICE_URL: http://auth-service:8080
+      EMPLOYEES_SERVICE_URL: http://service-employees:8080
+      DEPARTMENTS_SERVICE_URL: http://service-departments:8080
+      PROFILE_SERVICE_URL: http://service-profile:8080
+      LOGS_SERVICE_URL: http://service-logs:8080
+      OTEL_SERVICE_NAME: api-gateway
+    depends_on:
+      - auth-service
+      - service-employees
+      - service-departments
+      - service-logs
+      - service-profile
+
   # ── OBSERVABILIDAD ────────────────────────────────────────────────────────
 
   prometheus:
@@ -266,6 +289,7 @@ services:
       - service-departments
       - service-logs
       - service-profile
+      - api-gateway
 
   grafana:
     image: grafana/grafana:latest

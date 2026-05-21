@@ -15,71 +15,95 @@ const options = { credentials: credentials.plain(user_rabbit, password_rabbit) }
 const url = `amqp://${rabbit_host}:${port_rabbit}`
 
 async function connectionRabbitMq() {
-  let attempts = 10;
+    let attempts = 10;
 
-  while (attempts > 0) {
-    try {
-      const connection = await connect(url, options);
-      const channel = await connection.createChannel();
+    while (attempts > 0) {
+        try {
+            const connection = await connect(url, options);
+            const channel = await connection.createChannel();
 
-      await channel.assertExchange(exchange_rabbit, "direct", {
-        durable: true
-      });
+            await channel.assertExchange(exchange_rabbit, "direct", {
+                durable: true
+            });
 
-      const queue = await channel.assertQueue(rabbitmq_name, {
-        durable: false
-      });
+            // Cola principal para onboarding
+            const queue = await channel.assertQueue(rabbitmq_name, {
+                durable: false
+            });
+            await channel.bindQueue(queue.queue, exchange_rabbit, event_one);
+            await channel.bindQueue(queue.queue, exchange_rabbit, event_two);
 
-      await channel.bindQueue(queue.queue, exchange_rabbit, event_one);
-      await channel.bindQueue(queue.queue, exchange_rabbit, event_two);
+            // Cola dedicada para eventos de eliminación
+            const queue_delete = await channel.assertQueue("service_logs_delete", {
+                durable: false
+            });
+            await channel.bindQueue(queue_delete.queue, exchange_rabbit, event_two);
 
-      channel.consume(queue.queue, (message) => {
-        if (message !== null) {
-          const routingKey = message.fields.routingKey;
-          const message_json = JSON.parse(message.content.toString());
-          switch (routingKey) {
-            case event_one:
-              insert_log_save_employee(JSON.stringify({
-                ID_employee: message_json.id,
-                name_employee: message_json.nameUser,
-                email_employee: message_json.email,
-                department_id: message_json.departmentID,
-                date_enter: message_json.dateEnter
-              }));
-              console.log("NOTIFICATION Tipo:BIENVENIDA | para: " + message_json.email)
-              break;
-            case event_two:
-              const employee_delete = new DeleteEmployee(
-                  message_json.id_employee,
-                  message_json.name_employee,
-                  message_json.email_employee
-              );
-              // CORRECCIÓN — ahora guarda en MongoDB
-              insert_log_delete_employee({
-                id_employee: employee_delete.getId(),
-                name_employee: employee_delete.getName(),
-                email_employee: employee_delete.getEmail()
-              });
-              console.log("[NOTIFICATION] tipo: DESVINCULACIÓN para: " + employee_delete.getEmail())
-              break;
-            default:
-              break;
-          }
+            // Consumidor cola principal (onboarding)
+            channel.consume(queue.queue, (message) => {
+                if (message !== null) {
+                    const routingKey = message.fields.routingKey;
+                    const message_json = JSON.parse(message.content.toString());
+                    switch (routingKey) {
+                        case event_one:
+                            insert_log_save_employee(JSON.stringify({
+                                ID_employee: message_json.id,
+                                name_employee: message_json.nameUser,
+                                email_employee: message_json.email,
+                                department_id: message_json.departmentID,
+                                date_enter: message_json.dateEnter
+                            }));
+                            console.log("NOTIFICATION Tipo:BIENVENIDA | para: " + message_json.email)
+                            break;
+                        case event_two:
+                            const employee_delete = new DeleteEmployee(
+                                message_json.id_employee,
+                                message_json.name_employee,
+                                message_json.email_employee
+                            );
+                            insert_log_delete_employee({
+                                id_employee: employee_delete.getId(),
+                                name_employee: employee_delete.getName(),
+                                email_employee: employee_delete.getEmail()
+                            });
+                            console.log("[NOTIFICATION] tipo: DESVINCULACIÓN para: " + employee_delete.getEmail())
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }, { noAck: true });
+
+            // Consumidor cola dedicada de eliminación
+            channel.consume(queue_delete.queue, (message) => {
+                if (message !== null) {
+                    const message_json = JSON.parse(message.content.toString());
+                    const employee_delete = new DeleteEmployee(
+                        message_json.id_employee,
+                        message_json.name_employee,
+                        message_json.email_employee
+                    );
+                    insert_log_delete_employee({
+                        id_employee: employee_delete.getId(),
+                        name_employee: employee_delete.getName(),
+                        email_employee: employee_delete.getEmail()
+                    });
+                    console.log("[NOTIFICATION] tipo: DESVINCULACIÓN (cola dedicada) para: " + employee_delete.getEmail())
+                }
+            }, { noAck: true });
+
+            return;
+
+        } catch (error) {
+            attempts--;
+            if (attempts === 0) return;
+            await sleep(5000);
         }
-      }, { noAck: true });
-
-      return;
-
-    } catch (error) {
-      attempts--;
-      if (attempts === 0) return;
-      await sleep(5000);
     }
-  }
 }
 
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export { connectionRabbitMq }
