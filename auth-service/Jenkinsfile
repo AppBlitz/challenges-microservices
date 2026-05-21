@@ -1,77 +1,83 @@
-agent {
-  docker {
-    image 'gradle:9.4.1-jdk21'  // ← igual que employee-backend
-    args '''
-          -v /root/.gradle:/root/.gradle
-          -v /var/run/docker.sock:/var/run/docker.sock
-          --network challenges-microservices_microservices-network
-          '''
-  }
-}
-
-stages {
-  stage('Checkout') {
-    steps { echo '📥 Código obtenido' }
+pipeline {
+  agent {
+    docker {
+      image 'gradle:8.14-jdk21'
+      args '''
+            -v /root/.gradle:/root/.gradle
+            -v /var/run/docker.sock:/var/run/docker.sock
+            --network challenges-microservices_microservices-network
+            '''
+    }
   }
 
-  stage('Build') {
-    steps {
-      dir('auth-service') {
-        sh 'chmod +x ./gradlew'
-        sh './gradlew clean classes -x test'
+  environment {
+    SONAR_TOKEN = credentials('sonar-token')
+  }
+
+  stages {
+    stage('Checkout') {
+      steps { echo '📥 Código obtenido' }
+    }
+
+    stage('Build') {
+      steps {
+        dir('auth-service') {
+          sh 'chmod +x ./gradlew'
+          sh './gradlew clean classes -x test'
+        }
+      }
+    }
+
+    stage('Test') {
+      steps {
+        dir('auth-service') {
+          sh './gradlew test jacocoTestReport'
+        }
+      }
+      post {
+        always {
+          junit 'auth-service/build/test-results/test/*.xml'
+        }
+      }
+    }
+
+    stage('SonarQube') {
+      steps {
+        dir('auth-service') {
+          withSonarQubeEnv('SonarQube') {
+            sh """
+              ./gradlew sonar \
+                -Dsonar.projectKey=auth-service \
+                -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
+            """
+          }
+        }
+      }
+    }
+
+    stage('Package') {
+      steps {
+        script {
+          def tag = "${env.BUILD_NUMBER}"
+          sh """
+            apt-get update
+            apt-get install -y docker.io
+
+            docker build \
+              -t localhost:5000/auth-service:${tag} \
+              -t localhost:5000/auth-service:latest \
+              ./auth-service
+
+            docker push localhost:5000/auth-service:${tag}
+            docker push localhost:5000/auth-service:latest
+          """
+        }
       }
     }
   }
 
-  stage('Test') {
-    steps {
-      dir('auth-service') {
-        sh './gradlew test jacocoTestReport'
-      }
-    }
-    post {
-      always {
-        junit 'auth-service/build/test-results/test/*.xml'
-      }
-    }
+  post {
+    success { echo '✅ Pipeline auth-service completado' }
+    failure { echo '❌ Pipeline auth-service falló' }
   }
-
-  // stage('SonarQube') {
-  //   steps {
-  //     dir('auth-service') {
-  //       withSonarQubeEnv('SonarQube') {
-  //         sh """
-  //           ./gradlew sonar \
-  //             -Dsonar.projectKey=auth-service \
-  //             -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/test/jacocoTestReport.xml
-  //         """
-  //       }
-  //     }
-  //   }
-  // }
-
-  stage('Package') {
-    steps {
-      script {
-        def tag = "${env.BUILD_NUMBER}"
-        sh """
-          apt-get update
-          apt-get install -y docker.io
-
-          docker build \
-            -t localhost:5000/auth-service:${tag} \
-            -t localhost:5000/auth-service:latest \
-            ./auth-service
-
-          docker push localhost:5000/auth-service:${tag}
-          docker push localhost:5000/auth-service:latest
-        """
-      }
-    }
-  }
-}
-
-post {
-  success { echo '✅ Pipeline auth-service completado' }
-  failure { echo '❌ Pipeline auth-service falló' }
 }
