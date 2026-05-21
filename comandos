@@ -1,4 +1,4 @@
----Ver la cantidad de departamentos que hay---
+---Ver cuales departamentos hay---
 
 docker exec -it challenges-microservices-db-d-1 mysql -u carlos -pdepartments12345 departments -e "SELECT * FROM departments;"
 
