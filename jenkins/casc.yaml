@@ -60,3 +60,32 @@ jobs:
           }
         }
       }
+  - script: |
+      pipelineJob('auth-service') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote { url('https://github.com/AppBlitz/challenges-microservices.git') }
+                branches('*/jahn')
+              }
+            }
+            scriptPath('auth-service/Jenkinsfile')
+          }
+        }
+      }
+  - script: |
+      pipelineJob('profile-service') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote { url('https://github.com/AppBlitz/challenges-microservices.git') }
+                branches('*/jahn')
+              }
+            }
+            scriptPath('management_profile/Jenkinsfile')
+          }
+        }
+      }
+

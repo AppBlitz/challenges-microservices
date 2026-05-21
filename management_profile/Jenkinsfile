@@ -1,0 +1,110 @@
+pipeline {
+  agent {
+    docker {
+      image 'mcr.microsoft.com/dotnet/sdk:9.0'
+      args '''
+            -v /root/.nuget:/root/.nuget
+            -v /var/run/docker.sock:/var/run/docker.sock
+            --network challenges-microservices_microservices-network
+            '''
+    }
+  }
+
+  environment {
+    SONAR_TOKEN = credentials('sonar-token')
+    DOTNET_CLI_TELEMETRY_OPTOUT = '1'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        echo '📥 Código obtenido'
+      }
+    }
+
+    stage('Build') {
+      steps {
+        dir('management_profile') {
+          sh 'dotnet build --configuration Release --no-restore /p:WarningLevel=0 || dotnet restore && dotnet build --configuration Release /p:WarningLevel=0'
+        }
+      }
+    }
+
+    stage('Test') {
+      steps {
+        dir('management_profile') {
+          sh '''
+            dotnet test \
+              --configuration Release \
+              --collect:"XPlat Code Coverage" \
+              --results-directory ./TestResults \
+              -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+          '''
+        }
+      }
+      post {
+        always {
+          junit allowEmptyResults: true, testResults: 'management_profile/TestResults/**/*.xml'
+        }
+      }
+    }
+
+    stage('SonarQube') {
+      steps {
+        dir('management_profile') {
+          withSonarQubeEnv('SonarQube') {
+            sh '''
+              apt-get update -qq
+              apt-get install -y -qq wget unzip openjdk-17-jre
+
+              dotnet tool install --global dotnet-sonarscanner || true
+              export PATH="$PATH:/root/.dotnet/tools"
+
+              dotnet sonarscanner begin \
+                /k:"management-profile" \
+                /d:sonar.token=$SONAR_TOKEN \
+                /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml"
+
+              dotnet build --configuration Release /p:WarningLevel=0
+
+              dotnet sonarscanner end \
+                /d:sonar.token=$SONAR_TOKEN
+            '''
+          }
+        }
+      }
+    }
+
+    // stage('Quality Gate') {
+    //   steps {
+    //     timeout(time: 5, unit: 'MINUTES') {
+    //       waitForQualityGate abortPipeline: true
+    //     }
+    //   }
+    // }
+
+    stage('Package') {
+      steps {
+        script {
+          def tag = "${env.BUILD_NUMBER}"
+          sh """
+            apt-get install -y -qq docker.io
+
+            docker build \
+              -t localhost:5000/management-profile:${tag} \
+              -t localhost:5000/management-profile:latest \
+              ./management_profile
+
+            docker push localhost:5000/management-profile:${tag}
+            docker push localhost:5000/management-profile:latest
+          """
+        }
+      }
+    }
+  }
+
+  post {
+    success { echo '✅ Pipeline management-profile completado' }
+    failure { echo '❌ Pipeline management-profile falló' }
+  }
+}

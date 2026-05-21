@@ -23,4 +23,5 @@ RUN jenkins-plugin-cli --plugins \
   jacoco \
   htmlpublisher \
   timestamper \
-  ansicolor
+  ansicolor \
+  junit \
