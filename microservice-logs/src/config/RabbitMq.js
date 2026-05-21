@@ -22,9 +22,7 @@ async function connectionRabbitMq() {
       const connection = await connect(url, options);
       const channel = await connection.createChannel();
 
-      await channel.assertExchange(exchange_rabbit, "direct", {
-        durable: true
-      });
+      await channel.assertExchange(exchange_rabbit, "direct", { durable: true });
 
       const queue = await channel.assertQueue(rabbitmq_name, {
         durable: true

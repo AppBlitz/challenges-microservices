@@ -17,8 +17,10 @@ public class RabbitConfig {
     // public static final String ROUTING_KEY_DELETE = "${EVENT_TWO}";
     // public static final String ROUTING_KEY_RECUPERATION = "${EVENT_THREE}";
 
-    @Value("${name_queue}")       // coincide con NAME_QUEUE
-    private String QUEUE_NAME;
+    // @Value("${name_queue}")       // coincide con NAME_QUEUE
+    // private String QUEUE_NAME;
+    @SuppressWarnings("FieldMayBeFinal")
+    private String QUEUE_NAME = "auth.employee";
 
     @Value("${exchange_rabbit}")  // coincide con EXCHANGE_RABBIT
     private String EXCHANGE_NAME;

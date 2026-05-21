@@ -90,9 +90,9 @@ public class RabbitMqConsumerService : BackgroundService
         var event_one= Environment.GetEnvironmentVariable("EVENT_ONE") ?? "employee.save";
         var event_two= Environment.GetEnvironmentVariable("EVENT_TWO") ?? "employee.delete";
 
-        await channel.ExchangeDeclareAsync(Exchange, "direct", durable: false);
+        await channel.ExchangeDeclareAsync(Exchange, "direct", durable: true);
 
-        await channel.QueueDeclareAsync(queue, durable: false, exclusive: false, autoDelete: false);
+        await channel.QueueDeclareAsync(queue, durable: true, exclusive: false, autoDelete: false);
 
                 
         await channel.QueueBindAsync(queue, Exchange, event_one);
@@ -152,8 +152,6 @@ public class RabbitMqConsumerService : BackgroundService
                         Console.WriteLine("Procesando creación de perfil para el empleado...");
                         Console.WriteLine($"Contenido del mensaje: {employeeMessage.RootElement}");
                         Console.WriteLine($"ID del empleado: {employeeMessage.RootElement.GetProperty("id")}");
-                        Console.WriteLine($"ID del empleado: {employeeMessage.RootElement.GetProperty("id").ToString()}");
-                        Console.WriteLine($"Nombre del empleado: {employeeMessage.RootElement.GetProperty("id").GetString()}");
                         /// <summary>
                         /// Verifica si el perfil ya existe antes de crearlo.
                         /// </summary>
